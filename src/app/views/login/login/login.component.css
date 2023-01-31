@@ -1,0 +1,50 @@
+.login-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    backdrop-filter: blur(2px);
+}
+
+.form {
+    width: 450px;
+}
+
+.card{
+    background-color: #282933;
+}
+
+.card h1{
+    color: aliceblue;
+    font-size: 2em;
+}
+
+.card h3{
+    color: aliceblue;
+    font-size: 1em;  
+}
+
+input{
+    background-color: #48484e;
+}
+
+.login-button{
+    background-color: #857dcc;
+}
+  
+.login-image-background {
+    background-image: url("../../../../assets/login_background.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.see-password-section{
+    text-align: left;
+}
+
+.forgot-password-section{
+    text-align: right;
+}
