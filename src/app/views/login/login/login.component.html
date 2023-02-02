@@ -1,0 +1,37 @@
+<div class="login-image-background ">
+    <div class="container-fluid login-container ">
+        <div class="card border p-3 form">
+            <div class="row text-left d-flex">
+                <div class="col text-left d-flex">
+                    <h1>Login</h1>
+                </div>
+            </div>
+            <div class="row text-left d-flex">
+                <div class="col text-left d-flex">
+                    <h3>Sign In to your account</h3>
+                </div>
+            </div>
+            <div class="row form-group m-2">
+                <input type="text" name="user_name" id="user_name" class="form-control" placeholder="Username" [(ngModel)]="user_name" (ngModelChange)="ValidateData('check')">
+                <div *ngIf="!validation.user_name" class="text-danger">{{errorValidationMessage.user_name}}</div>   
+            </div>
+            <div class="row form-group m-2">
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" [(ngModel)]="password" (ngModelChange)="ValidateData('check')">
+                <div *ngIf="!validation.password" class="text-danger">{{errorValidationMessage.password}}</div>   
+
+            </div>
+            <div  class="row m-2">
+                <button (click)="Login()" type="submit" class="w-100 btn login-button">Login</button>
+            </div>
+            <div class="row ">
+                <div class="col-6 see-password-section">
+                    <a (click)="SeePassword()" class="text-muted" href="#!">See Password</a>
+                </div>
+                <div class="col-6 forgot-password-section">
+                    <a (click)="OpenCodeSenderModal()" class="text-muted" href="#!">Forgot password?</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
