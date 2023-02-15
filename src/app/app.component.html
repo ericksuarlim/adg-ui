@@ -1,5 +1,7 @@
-<div class="body">
+<div class="body dark-theme">
   <div class="wrapper">
-    <router-outlet ></router-outlet>
+    <router-outlet >
+      <app-navbar class="dark-theme"  *ngIf="user!=null"></app-navbar> 
+    </router-outlet>
   </div>
 </div>

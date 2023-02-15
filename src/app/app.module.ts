@@ -8,20 +8,28 @@ import { HttpClientModule } from '@angular/common/http';
 import { CodeSenderModalComponent } from './modals/code-sender-modal/code-sender-modal.component';
 import { FormsModule } from '@angular/forms';
 import { HomeComponent } from './views/home/home.component';
+import { NavbarComponent } from './views/navbar/navbar.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MdbCollapseModule } from 'mdb-angular-ui-kit/collapse';
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     CodeSenderModalComponent,
-    HomeComponent
+    HomeComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    MdbCollapseModule 
   ],
   providers: [],
   bootstrap: [AppComponent]

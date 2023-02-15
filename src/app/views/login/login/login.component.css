@@ -1,4 +1,4 @@
-.login-container{
+.login__container{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6,33 +6,30 @@
     backdrop-filter: blur(2px);
 }
 
-.form {
+.login__card{
     width: 450px;
+    background-color: var(--primary-color);
 }
 
-.card{
-    background-color: #282933;
-}
-
-.card h1{
-    color: aliceblue;
+.login__card h1{
+    color: var(--fourth-color);
     font-size: 2em;
 }
 
-.card h3{
-    color: aliceblue;
+.login__card h3{
+    color: var(--fourth-color);
     font-size: 1em;  
 }
 
 input{
-    background-color: #48484e;
+    background-color: var(--second-color);
 }
 
-.login-button{
-    background-color: #857dcc;
+.login__enter-button{
+    background-color: var(--third-color);
 }
   
-.login-image-background {
+.login__image-background {
     background-image: url("../../../../assets/login_background.jpg");
     background-position: center;
     background-repeat: no-repeat;

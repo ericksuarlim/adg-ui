@@ -1,0 +1,27 @@
+
+.dark-theme{
+    --primary-color: #282933;
+    --second-color: #48484e;
+    --third-color: #857DCC;
+    --fourth-color: #f0f8ff;
+    --fiveth-color: #2A2b36;
+    --sixth-color: #9D97D6;
+}
+
+.light-theme{
+    --primary-color: #f0f8ff;
+    --second-color: #48484e;
+    --third-color: #857DCC;
+    --fourth-color: #282933;
+    --fiveth-color: #5B4CE2;
+    --sixth-color: #321FDB;
+}
+
+
+@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '~@fortawesome/fontawesome-free/scss/solid.scss';
+@import '~@fortawesome/fontawesome-free/scss/regular.scss';
+@import '~@fortawesome/fontawesome-free/scss/brands.scss';
+@import '~mdb-angular-ui-kit/assets/scss/mdb.scss';
+
+

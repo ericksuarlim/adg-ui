@@ -8,3 +8,7 @@
 .wrapper{
     flex:1;
 }
+
+.page__togler-button{
+    margin-bottom: -150px;
+}

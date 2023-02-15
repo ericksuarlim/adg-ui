@@ -8,9 +8,12 @@ import * as firebase from 'firebase/app'
 })
 export class AppComponent {
   title = 'adg-ui';
+  user : string;
   
   async ngOnInit(){
-    await this.initFirebase()
+    await this.initFirebase();
+    this.user = localStorage.getItem('user_name')!;
+    console.log("Ahora",this.user)
   }
   
   async initFirebase(){

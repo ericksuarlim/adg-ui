@@ -1,0 +1,45 @@
+.navbar__btn-dark{
+    background-color: var(--second-color);
+    color: var(--fourth-color);
+    border-radius: 5px 0px 0px 5px;
+    
+}
+
+.navbar__btn-light{
+    background-color: var(--fourth-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 0px 5px 5px 0px;
+    margin-right: 5px;
+}
+
+.navbar__logo-navbar{
+    width: 150px;
+    border-radius: 5px;
+    height: 50px;
+}
+
+.navbar__btn-profile{
+    color: var(--fourth-color);
+    background-color: var(--second-color);
+    border-radius: 5px;
+}
+
+.navbar{
+    background-color: #2A2b36;
+}
+
+.navbar__options--right{
+    justify-content: right;
+}
+
+.navbar-toggler{
+    border: 1px solid white;
+    background-color: var(--second-color);
+}
+
+.bi-list{
+    color: white;
+}
+
+
