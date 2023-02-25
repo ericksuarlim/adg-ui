@@ -6,7 +6,7 @@
     background: var(--second-color);
     color:var(--fiveth-color);
     transition: all 0.3s;
-    position: fixed;
+    position: absolute;
     left: 0;
     text-align: center;
 }

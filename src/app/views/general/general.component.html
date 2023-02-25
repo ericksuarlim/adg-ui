@@ -1,1 +1,30 @@
-<p>general works!</p>
+<div class="container">
+    <div class="row">
+        <div class="table-responsive">
+            <table aria-describedby="table-general" class="table table-striped">
+                <thead class="thead">
+                  <tr>
+                    <th scope="col" class="text-center">Registry Number</th>
+                    <th scope="col" class="text-center">Sex</th>
+                    <th scope="col" class="text-center">Color</th>
+                    <th scope="col" class="text-center">Born Year</th>
+                    <th scope="col" class="text-center">Place</th>
+                    <th scope="col" class="text-center">Observation</th>
+
+                  </tr>
+                </thead>
+                <tbody *ngFor="let general of generals">
+                  <tr>
+                    <td class="text-center">{{general.registry_number}}</td>
+                    <td class="text-center">{{general.sex}}</td>
+                    <td class="text-center">{{general.color}}</td>
+                    <th scope="row" class="text-center">{{(general.birthdate)| date:'yyyy':'+0200':'es-AR'}}</th>
+                    <td class="text-center">{{general.place}}</td>
+                    <td class="text-center">{{general.observation}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="generals?.length === 0" class="empty-table-message">No Data</div>
+        </div>
+    </div>
+</div>
