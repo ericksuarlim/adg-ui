@@ -12,21 +12,21 @@
 }
 
 .login__card h1{
-    color: var(--fourth-color);
+    color: var(--sixth-color);
     font-size: 2em;
 }
 
 .login__card h3{
-    color: var(--fourth-color);
+    color: var(--sixth-color);
     font-size: 1em;  
 }
 
 input{
-    background-color: var(--second-color);
+    background-color: var(--third-color);
 }
 
 .login__enter-button{
-    background-color: var(--third-color);
+    background-color: var(--fourth-color);
 }
   
 .login__image-background {

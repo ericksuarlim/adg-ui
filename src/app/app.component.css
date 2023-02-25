@@ -1,14 +1,23 @@
 .body{
-    text-align:center;
+    /* text-align:center;
     display:flex;
     flex-direction:column;
-    min-height:100vh;
-}
-
-.wrapper{
-    flex:1;
+    min-height:100vh; */
 }
 
 .page__togler-button{
     margin-bottom: -150px;
 }
+
+
+
+.pagee.active{
+    margin-left: 250px;
+    transition: all 0.3s;
+
+}
+
+.pagee{
+    transition: all 0.3s;
+}
+

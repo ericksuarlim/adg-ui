@@ -1,16 +1,5 @@
-.navbar__btn-dark{
-    background-color: var(--second-color);
-    color: var(--fourth-color);
-    border-radius: 5px 0px 0px 5px;
-    
-}
-
-.navbar__btn-light{
-    background-color: var(--fourth-color);
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-    border-radius: 0px 5px 5px 0px;
-    margin-right: 5px;
+.navbar{
+    background-color: var(--primary-color);
 }
 
 .navbar__logo-navbar{
@@ -19,27 +8,44 @@
     height: 50px;
 }
 
-.navbar__btn-profile{
-    color: var(--fourth-color);
-    background-color: var(--second-color);
-    border-radius: 5px;
-}
-
-.navbar{
-    background-color: #2A2b36;
-}
-
 .navbar__options--right{
     justify-content: right;
 }
 
-.navbar-toggler{
-    border: 1px solid white;
-    background-color: var(--second-color);
+.navbar__btn-dark{
+    background-color: var(--fourth-color);
+    color: var(--primary-color);
+    border-radius: 5px 0px 0px 5px;
+    border-top: 1px solid var(--fourth-color);
+    border-left: 1px solid var(--fourth-color);
+    border-bottom: 1px solid var(--fourth-color);
 }
 
-.bi-list{
-    color: white;
+.navbar__btn-light{
+    background-color: var(--fiveth-color);
+    color: var(--primary-color);
+    border-radius: 0px 5px 5px 0px;
+    margin-right: 5px;
+    border-top: 1px solid var(--fourth-color);
+    border-right: 1px solid var(--fourth-color);
+    border-bottom: 1px solid var(--fourth-color);
 }
+
+.navbar__btn-profile{
+    border: 1px solid var(--fourth-color);
+    color: var(--fourth-color);
+    border-radius: 5px;
+   
+}
+
+.navbar__btn-toggler-navbar, .navbar__btn-toggler-sidebar{
+    border: 1px solid var(--fourth-color);
+    color: var(--fourth-color);
+    padding: 0px;
+    width: 35px;
+    margin: 0px;
+    height: 35px;
+}
+
 
 

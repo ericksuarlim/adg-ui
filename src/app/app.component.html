@@ -1,7 +1,10 @@
-<div class="body dark-theme">
-  <div class="wrapper">
-    <router-outlet >
-      <app-navbar class="dark-theme"  *ngIf="user!=null"></app-navbar> 
-    </router-outlet>
+<div class="body">
+  <app-navbar class="dark-theme" *ngIf="user!=null" (toggleSidebarToParent)="toggleSidebarToParent($event)"></app-navbar>
+  <div class="page-content">
+    <app-sidebar class="dark-theme" *ngIf="user!=null" [toggleSidebarFromParent]="openSidebar"> </app-sidebar> 
+    <div class="pagee dark-theme" [class.active]="!openSidebar">
+      <div>Home/Dashboard</div>
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>

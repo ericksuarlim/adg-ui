@@ -1,0 +1,26 @@
+.container-fluid{
+  padding: 15px;
+  background-color: var(--primary-color);
+}
+
+.card{
+  max-width: 250px;
+  min-height: 250px;
+  background-color: var(--second-color);
+  color: var(--sixth-color);
+}
+
+.card-header {
+  font-weight: 600;
+  color: var(--fiveth-color);
+  font-size: 1.2em;
+}
+
+.card img{
+  border-radius: 7px;
+}
+.card:hover{
+  transform: scale(1.03);
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}

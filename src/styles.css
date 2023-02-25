@@ -1,20 +1,37 @@
 
 .dark-theme{
+    --primary-color: #231F20;
+    --second-color: #282933;
+    --third-color: #48484e;
+    --fourth-color: #857DCC;
+    --fiveth-color: #9D97D6;
+    --sixth-color: #f0f8ff;
+    
+
+    /* 
+    rgb(202,202,205)
+    --seventh-color: #231F20;
     --primary-color: #282933;
+    --fiveth-color: #2A2b36;
     --second-color: #48484e;
     --third-color: #857DCC;
-    --fourth-color: #f0f8ff;
-    --fiveth-color: #2A2b36;
     --sixth-color: #9D97D6;
+    --fourth-color: #f0f8ff; */
 }
 
 .light-theme{
-    --primary-color: #f0f8ff;
+    /* --primary-color: #f0f8ff;
     --second-color: #48484e;
     --third-color: #857DCC;
     --fourth-color: #282933;
     --fiveth-color: #5B4CE2;
-    --sixth-color: #321FDB;
+    --sixth-color: #321FDB; */
+    --primary-color: #f0f8ff;
+    --second-color: #9D97D6;
+    --third-color: #857DCC;
+    --fourth-color: #48484e;
+    --fiveth-color: #282933;
+    --sixth-color: #231F20;
 }
 
 

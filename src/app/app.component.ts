@@ -9,14 +9,20 @@ import * as firebase from 'firebase/app'
 export class AppComponent {
   title = 'adg-ui';
   user : string;
+  openSidebar: boolean;
   
   async ngOnInit(){
     await this.initFirebase();
     this.user = localStorage.getItem('user_name')!;
-    console.log("Ahora",this.user)
   }
   
   async initFirebase(){
     await firebase.initializeApp(environment.firebaseConfig);
   }
+
+  
+  toggleSidebarToParent(openSidebar:boolean){
+    this.openSidebar = openSidebar;
+  }
+
 }

@@ -11,6 +11,8 @@ import { HomeComponent } from './views/home/home.component';
 import { NavbarComponent } from './views/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MdbCollapseModule } from 'mdb-angular-ui-kit/collapse';
+import { SidebarComponent } from './views/sidebar/sidebar.component';
+import { GeneralComponent } from './views/general/general.component';
 
 
 
@@ -20,7 +22,9 @@ import { MdbCollapseModule } from 'mdb-angular-ui-kit/collapse';
     LoginComponent,
     CodeSenderModalComponent,
     HomeComponent,
-    NavbarComponent
+    NavbarComponent,
+    SidebarComponent,
+    GeneralComponent
   ],
   imports: [
     BrowserModule,
