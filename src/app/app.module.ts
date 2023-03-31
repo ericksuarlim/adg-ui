@@ -15,6 +15,7 @@ import { SidebarComponent } from './views/sidebar/sidebar.component';
 import { GeneralComponent } from './views/general/general.component';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 registerLocaleData(localeEsAr, 'es-Ar');
 
 
@@ -35,7 +36,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
-    MdbCollapseModule 
+    MdbCollapseModule,
+    NgbDropdownModule
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'es-Ar' }],
   bootstrap: [AppComponent]

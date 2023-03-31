@@ -9,12 +9,9 @@
     margin-bottom: -150px;
 }
 
-
-
 .pagee.active{
     margin-left: 250px;
     transition: all 0.3s;
-
 }
 
 .pagee{

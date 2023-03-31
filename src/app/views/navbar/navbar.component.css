@@ -47,5 +47,24 @@
     height: 35px;
 }
 
+.navbar__dropdown__btn-profile{
+  
+    display: inline;
+}
+
+.navbar__dropdown__group{
+    background: var(--second-color);
+}
+
+.navbar__dropdown__group_logout-btn{
+   color: var(--sixth-color);
+}
+
+.navbar__dropdown__group_logout-btn:hover{
+    background-color: var(--third-color);
+}
+
+
+
 
 
