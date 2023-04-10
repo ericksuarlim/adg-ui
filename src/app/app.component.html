@@ -3,7 +3,6 @@
   <div class="page-content">
     <app-sidebar class="dark-theme" *ngIf="user!=null" [toggleSidebarFromParent]="openSidebar"> </app-sidebar> 
     <div class="pagee dark-theme" [class.active]="!openSidebar">
-      <div *ngIf="user!=null">{{currentUrl}}</div>
       <router-outlet></router-outlet>
     </div>
   </div>

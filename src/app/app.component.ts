@@ -14,18 +14,12 @@ export class AppComponent {
   title = 'adg-ui';
   user : string;
   openSidebar: boolean;
-  currentUrl: String;
   
   constructor(
     private bnIdle: BnNgIdleService,
     private authenticationService: AuthenticationServiceService,
     private router:Router
   ) {     
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.currentUrl = event.url;
-      }
-    }); 
   }
 
   async ngOnInit(){
@@ -34,7 +28,6 @@ export class AppComponent {
     this.user = localStorage.getItem('user_name')!;
     if(localStorage.getItem('user_token')!=null){
       if(!this.isTokenExpired(localStorage.getItem('user_token')!)){
-        console.log('Entro al if del token')
         this.CerrarSesion();
       }
     }
@@ -63,7 +56,6 @@ export class AppComponent {
   }
 
   CerrarSesion(){
-    console.log("Entro")
     const datos ={user_name: localStorage.getItem('user_name')}
     this.authenticationService.Logout(datos).subscribe((result)=>{
       localStorage.clear();
