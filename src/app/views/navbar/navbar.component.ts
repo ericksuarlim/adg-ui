@@ -9,14 +9,17 @@ import { AuthenticationServiceService } from 'src/app/services/authentication-se
 })
 export class NavbarComponent implements OnInit {
   openSidebar = false;
+  isNavbarCollapsed = true;
+  username = '';
   @Output() toggleSidebarToParent = new EventEmitter<boolean>();
 
   constructor(
-    private authenticationService: AuthenticationServiceService,
-    private router:Router
+    private readonly authenticationService: AuthenticationServiceService,
+    private readonly router:Router
   ) { }
 
   ngOnInit(): void {
+    this.username = this.authenticationService.getUsername() ?? 'Usuario';
   }
   
   toggleSidebar() {
@@ -24,14 +27,21 @@ export class NavbarComponent implements OnInit {
     this.toggleSidebarToParent.emit(this.openSidebar);
   }
 
-  Logout(){
-    const data ={user_name: localStorage.getItem('user_name')}
-    this.authenticationService.Logout(data).subscribe((resultado)=>{
-      localStorage.clear();
-      this.router.navigateByUrl(`/`).then(() => {
-        window.location.reload();
-      });
-    })
+  toggleNavbar(): void {
+    this.isNavbarCollapsed = !this.isNavbarCollapsed;
+  }
+
+  Logout(): void {
+    this.authenticationService.logout().subscribe({
+      next: () => {
+        this.authenticationService.clearSession();
+        this.router.navigateByUrl('/login');
+      },
+      error: () => {
+        this.authenticationService.clearSession();
+        this.router.navigateByUrl('/login');
+      }
+    });
   }
 
 }

@@ -1,20 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CattleComponent } from './cattle.component';
 
-import { GeneralComponent } from './general.component';
-
-describe('GeneralComponent', () => {
-  let component: GeneralComponent;
-  let fixture: ComponentFixture<GeneralComponent>;
+describe('CattleComponent', () => {
+  let component: CattleComponent;
+  let fixture: ComponentFixture<CattleComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GeneralComponent ]
+      declarations: [ CattleComponent ]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(GeneralComponent);
+    fixture = TestBed.createComponent(CattleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

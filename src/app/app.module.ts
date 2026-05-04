@@ -1,21 +1,20 @@
 import { LOCALE_ID,NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './views/login/login/login.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientModule } from '@angular/common/http';
 import { CodeSenderModalComponent } from './modals/code-sender-modal/code-sender-modal.component';
 import { FormsModule } from '@angular/forms';
 import { HomeComponent } from './views/home/home.component';
 import { NavbarComponent } from './views/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MdbCollapseModule } from 'mdb-angular-ui-kit/collapse';
 import { SidebarComponent } from './views/sidebar/sidebar.component';
-import { GeneralComponent } from './views/general/general.component';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 registerLocaleData(localeEsAr, 'es-Ar');
 
 
@@ -26,8 +25,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
     CodeSenderModalComponent,
     HomeComponent,
     NavbarComponent,
-    SidebarComponent,
-    GeneralComponent
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
@@ -35,11 +33,13 @@ registerLocaleData(localeEsAr, 'es-Ar');
     NgbModule,
     HttpClientModule,
     FormsModule,
-    BrowserAnimationsModule,
-    MdbCollapseModule,
-    NgbDropdownModule
+    BrowserAnimationsModule
   ],
-  providers: [{ provide: LOCALE_ID, useValue: 'es-Ar' }],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'es-Ar' },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

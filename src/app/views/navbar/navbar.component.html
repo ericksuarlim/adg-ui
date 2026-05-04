@@ -6,42 +6,23 @@
         <a class="navbar-brand me-2" href="/home">
             <img
                 src="../../../assets/logo_navbar.jpg"
+                alt="Logo ADG"
                 class="navbar__logo-navbar"
             />
         </a> 
-        <button class="navbar__btn-toggler-navbar navbar-toggler" type="button" (click)="buttonsNav.toggle()" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar__btn-toggler-navbar navbar-toggler" type="button" (click)="toggleNavbar()" aria-expanded="false" aria-label="Toggle navigation">
             <i class="bi bi-list"></i>
         </button>
-        <div class="navbar__options--right collapse navbar-collapse" mdbCollapse #buttonsNav="mdbCollapse" >
-            <!-- <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Button</a>
-                </li>
-            </ul> -->
+        <div class="navbar__options--right collapse navbar-collapse" [ngbCollapse]="isNavbarCollapsed">
             <div class="">
                 <button type="button" class="navbar__btn-dark btn"><i class="bi bi-moon"></i></button>
                 <button type="button" class="navbar__btn-light btn"><i class="bi bi-sun"></i></button>
                 <div ngbDropdown class="dropdown navbar__dropdown__btn-profile">
-                    <button ngbDropdownToggle type="button" class="navbar__btn-profile btn" id="dropdownButton" ><i class="bi bi-person-circle"></i> Erick Surez</button>
+                    <button ngbDropdownToggle type="button" class="navbar__btn-profile btn" id="dropdownButton" ><i class="bi bi-person-circle"></i> {{ username }}</button>
                     <div ngbDropdownMenu class="navbar__dropdown__group"  aria-labelledby="dropdownButton">
                         <button type="button" class="navbar__dropdown__group_logout-btn btn dropdown-item" (click)="Logout()"><i class="bi bi-person-lock"></i> Lock Account</button>
                     </div>
                   </div>
-                <!-- <button type="button" class="navbar__btn-profile btn"><i class="bi bi-person-circle"> Erick Surez</i></button>
-                <li  class="nav-item dropdown primary"> Erick
-                    <a class="nav-link dropdown-toggle float-right" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Servicios
-                    </a>
-                    <ul class="dropdown-menu" >
-                        <li  class="dropdown-item"><a href="/viajes">Viajes</a></li>
-                        <li  class="dropdown-item"><a href="/encomiendas">Encomiendas</a></li>
-                        <li  class="dropdown-item"><a href="/reservas">Reservas</a></li>
-                        <li  class="dropdown-item"><a href="/anuncios">Anuncios</a></li>                                        
-                    </ul>
-                </li> -->
             </div>
         </div>
     </div>

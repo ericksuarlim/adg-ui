@@ -1,69 +1,73 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import * as firebase from 'firebase/app';
 import { BnNgIdleService } from 'bn-ng-idle';
 import { AuthenticationServiceService } from './services/authentication-service.service';
-import { Router,NavigationEnd  } from '@angular/router';
+import { Router } from '@angular/router';
+import { SessionService } from './services/session.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'adg-ui';
-  user : string;
-  openSidebar: boolean;
+  user: string | null = null;
+  openSidebar = false;
   
   constructor(
-    private bnIdle: BnNgIdleService,
-    private authenticationService: AuthenticationServiceService,
-    private router:Router
+    private readonly bnIdle: BnNgIdleService,
+    private readonly authenticationService: AuthenticationServiceService,
+    private readonly sessionService: SessionService,
+    private readonly router:Router
   ) {     
   }
 
-  async ngOnInit(){
-    await this.initFirebase();
+  ngOnInit(): void {
+    this.initFirebase();
    
-    this.user = localStorage.getItem('user_name')!;
-    if(localStorage.getItem('user_token')!=null){
-      if(!this.isTokenExpired(localStorage.getItem('user_token')!)){
+    this.user = this.authenticationService.getUsername();
+    this.openSidebar = this.user === null;
+
+    if (!this.authenticationService.isAuthenticated()) {
+      this.authenticationService.clearSession();
+      this.user = null;
+      this.openSidebar = true;
+    }
+
+    this.sessionService.session$.subscribe((session) => {
+      this.user = session?.username ?? null;
+      this.openSidebar = !session;
+    });
+
+    this.bnIdle.startWatching(28800).subscribe((isTimedOut: boolean) => {
+      if (isTimedOut) {
         this.CerrarSesion();
       }
-    }
-    if(localStorage.getItem('user_token')==null){
-      this.openSidebar =true;
-    }
-    this.bnIdle.startWatching(28800).subscribe((isTimedOut: boolean) => {
-      this.CerrarSesion()
     });
 
 
   }
 
-  isTokenExpired(token: string) {
-    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
-    return expiry * 1000 > Date.now();
+  initFirebase(): void {
+    firebase.initializeApp(environment.firebaseConfig);
   }
-  
-  async initFirebase(){
-    await firebase.initializeApp(environment.firebaseConfig);
-  }
-
   
   toggleSidebarToParent(openSidebar:boolean){
     this.openSidebar = openSidebar;
   }
 
   CerrarSesion(){
-    const datos ={user_name: localStorage.getItem('user_name')}
-    this.authenticationService.Logout(datos).subscribe((result)=>{
-      localStorage.clear();
-      this.router.navigateByUrl(`/`).then(() => {
-        window.location.reload();
-      });
-    })
+    this.authenticationService.logout().subscribe({
+      next: () => {
+        this.authenticationService.clearSession();
+        this.router.navigateByUrl('/login');
+      },
+      error: () => {
+        this.authenticationService.clearSession();
+        this.router.navigateByUrl('/login');
+      }
+    });
   }
-
-
 }

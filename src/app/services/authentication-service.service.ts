@@ -1,40 +1,72 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { UserData } from '../commons/user.data';
-
-
-const httpOptions = {
-  headers : new HttpHeaders({
-    'Content-Type':'application/json',
-    'Authorization': "Bearer "+ UserData.jwt
-  })
-}
+import { LoginRequest, LoginResponse, SessionData } from '../models/auth.model';
+import { SessionService } from './session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationServiceService {
-  
-  baseUrl: string = environment.urlApi + "/session";
+  private readonly baseUrl: string = `${environment.urlApi}/session`;
 
-  constructor(private http:HttpClient) { }
+  constructor(
+    private readonly http: HttpClient,
+    private readonly sessionService: SessionService
+  ) { }
 
-  Logout(user_data:any): Observable<any>{
-    return this.http.post<any>(this.baseUrl+"/logout", user_data, httpOptions);
+  logout(): Observable<unknown> {
+    return this.http.post<unknown>(`${this.baseUrl}/logout`, {});
   }
 
-  Login(user_data:any):Observable<any>{
-    return this.http.post<any>(this.baseUrl+"/login", user_data, httpOptions);
+  login(userData: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, userData).pipe(
+      tap((response) => {
+        if (response.success && response.data) {
+          const payload = this.decodeToken(response.data.token);
+          const session: SessionData = {
+            token: response.data.token,
+            username: response.data.user.username,
+            uuid_company: response.data.user.uuid_company,
+            roles: payload?.roles ?? []
+          };
+          this.sessionService.setSession(session);
+        }
+      })
+    );
   }
 
-  RequestNewPassword(user_data:any):Observable<any>{
-    return this.http.post<any>(this.baseUrl+"/new-password", user_data, httpOptions);
+  requestNewPassword(userData: unknown): Observable<unknown> {
+    return this.http.post<unknown>(`${this.baseUrl}/new-password`, userData);
   }
 
-  ResetPassword(user_data:any): Observable<any>{
-    return this.http.post<any>(this.baseUrl+"/reset-password", user_data, httpOptions)
+  resetPassword(userData: unknown): Observable<unknown> {
+    return this.http.post<unknown>(`${this.baseUrl}/reset-password`, userData);
   }
-  
+
+  isAuthenticated(): boolean {
+    return this.sessionService.isAuthenticated();
+  }
+
+  getUsername(): string | null {
+    return this.sessionService.getUsername();
+  }
+
+  getRoles(): string[] {
+    return this.sessionService.getRoles();
+  }
+
+  clearSession(): void {
+    this.sessionService.clearSession();
+  }
+
+  private decodeToken(token: string): { roles?: string[] } | null {
+    try {
+      const [, payload] = token.split('.');
+      return JSON.parse(atob(payload)) as { roles?: string[] };
+    } catch {
+      return null;
+    }
+  }
 }

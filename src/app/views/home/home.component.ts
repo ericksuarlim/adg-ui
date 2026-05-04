@@ -15,8 +15,8 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  OpenGeneralTable(){
-    this.router.navigate(["/general"]);
+  openCattleTable(): void {
+    this.router.navigate(['/cattle']);
   }
   
 }

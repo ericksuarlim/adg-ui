@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NavbarComponent } from '../navbar/navbar.component'
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +12,7 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  @Input("toggleSidebarFromParent") classApplied: boolean;
+  @Input("toggleSidebarFromParent") classApplied = false;
 
 
 

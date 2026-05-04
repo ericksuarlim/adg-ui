@@ -1,3 +1,8 @@
+/*@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';*/
+/*@import '~@fortawesome/fontawesome-free/scss/solid.scss';*/
+/*@import '~@fortawesome/fontawesome-free/scss/regular.scss';*/
+/*@import '~@fortawesome/fontawesome-free/scss/brands.scss';*/
+/*@import '~mdb-angular-ui-kit/assets/scss/mdb.scss';*/
 
 .dark-theme{
     --primary-color: #231F20;
@@ -6,9 +11,9 @@
     --fourth-color: #857DCC;
     --fiveth-color: #9D97D6;
     --sixth-color: #f0f8ff;
-    
 
-    /* 
+
+    /*
     rgb(202,202,205)
     --seventh-color: #231F20;
     --primary-color: #282933;
@@ -34,11 +39,5 @@
     --sixth-color: #231F20;
 }
 
-
-@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import '~@fortawesome/fontawesome-free/scss/solid.scss';
-@import '~@fortawesome/fontawesome-free/scss/regular.scss';
-@import '~@fortawesome/fontawesome-free/scss/brands.scss';
-@import '~mdb-angular-ui-kit/assets/scss/mdb.scss';
 
 
