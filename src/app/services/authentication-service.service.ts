@@ -29,7 +29,9 @@ export class AuthenticationServiceService {
             token: response.data.token,
             username: response.data.user.username,
             uuid_company: response.data.user.uuid_company,
-            roles: payload?.roles ?? []
+            roles: payload?.roles ?? [],
+            membership_status: payload?.membership_status,
+            membership_renewal_at: payload?.membership_renewal_at ?? null
           };
           this.sessionService.setSession(session);
         }
@@ -61,7 +63,9 @@ export class AuthenticationServiceService {
     this.sessionService.clearSession();
   }
 
-  private decodeToken(token: string): { roles?: string[] } | null {
+  private decodeToken(
+    token: string
+  ): { roles?: string[]; membership_status?: SessionData['membership_status']; membership_renewal_at?: string | null } | null {
     try {
       const [, payload] = token.split('.');
       return JSON.parse(atob(payload)) as { roles?: string[] };

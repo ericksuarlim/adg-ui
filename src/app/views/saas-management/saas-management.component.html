@@ -1,0 +1,175 @@
+<div class="container-fluid saas-management">
+  <h3>Gestion de clientes SaaS</h3>
+  <p class="text-danger" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="card mb-3">
+    <div class="card-header">Companias</div>
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-md-3">
+          <input class="form-control" [(ngModel)]="companyForm.name" placeholder="Nombre comercial" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" [(ngModel)]="companyForm.legal_name" placeholder="Razon social" />
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="companyForm.plan_type">
+            <option *ngFor="let plan of planTypes" [value]="plan">{{ plan }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="companyForm.billing_cycle">
+            <option *ngFor="let cycle of billingCycles" [value]="cycle">{{ cycle }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="companyForm.membership_status">
+            <option *ngFor="let status of membershipStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row g-2 mt-2">
+        <div class="col-md-3">
+          <input class="form-control" [(ngModel)]="companyForm.tax_id" placeholder="Tax ID" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" type="date" [(ngModel)]="companyForm.membership_started_at" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" type="date" [(ngModel)]="companyForm.membership_renewal_at" />
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary me-2" (click)="saveCompany()">Guardar compania</button>
+          <button class="btn btn-outline-secondary" (click)="resetCompanyForm()">Limpiar</button>
+        </div>
+      </div>
+      <div class="row g-2 mt-2">
+        <div class="col-md-12">
+          <label class="form-check-label me-2">
+            <input type="checkbox" class="form-check-input me-1" [(ngModel)]="initialOwnerForm.enabled" />
+            Crear usuario inicial de la compania (opcional)
+          </label>
+        </div>
+      </div>
+      <div class="row g-2 mt-2" *ngIf="initialOwnerForm.enabled">
+        <div class="col-md-4">
+          <input class="form-control" [(ngModel)]="initialOwnerForm.username" placeholder="Username inicial" />
+        </div>
+        <div class="col-md-4">
+          <input class="form-control" [(ngModel)]="initialOwnerForm.email" placeholder="Email inicial" />
+        </div>
+        <div class="col-md-4">
+          <input class="form-control" type="password" [(ngModel)]="initialOwnerForm.password" placeholder="Password inicial" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Compania</th>
+          <th>Plan</th>
+          <th>Ciclo</th>
+          <th>Membresia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let company of companies">
+          <td>{{ company.name }}</td>
+          <td>{{ company.plan_type }}</td>
+          <td>{{ company.billing_cycle }}</td>
+          <td>{{ company.membership_status }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1" (click)="selectCompany(company)">Ver detalle</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deactivateCompany(company)">Baja logica</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!isLoading && companies.length === 0">No hay companias registradas.</div>
+  </div>
+
+  <div *ngIf="selectedCompany" class="row mt-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          Usuarios de {{ selectedCompany.name }}
+          <button class="btn btn-sm btn-outline-secondary float-end" (click)="supportModeEnabled = !supportModeEnabled">
+            {{ supportModeEnabled ? 'Ocultar soporte' : 'Modo soporte SaaS' }}
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" *ngIf="!supportModeEnabled">
+            La gestion de usuarios la debe realizar la compania. Activa "Modo soporte SaaS" solo para casos excepcionales.
+          </div>
+          <div class="row g-2" *ngIf="supportModeEnabled">
+            <div class="col-md-4">
+              <input class="form-control" [(ngModel)]="userForm.username" placeholder="Username" />
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" [(ngModel)]="userForm.email" placeholder="Email" />
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" type="password" [(ngModel)]="userForm.password" placeholder="Password" />
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm mt-2" (click)="createUser()" *ngIf="supportModeEnabled">Crear usuario</button>
+
+          <ul class="list-group mt-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let user of users">
+              <span>{{ user.username }} ({{ user.email || 'sin email' }})</span>
+              <button class="btn btn-sm btn-outline-danger" (click)="deactivateUser(user)" *ngIf="supportModeEnabled">Desactivar</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">Pagos manuales</div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input class="form-control" type="number" [(ngModel)]="paymentForm.amount" placeholder="Monto" />
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" [(ngModel)]="paymentForm.currency" placeholder="Moneda" />
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" [(ngModel)]="paymentForm.payment_method" placeholder="Metodo" />
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-6">
+              <select class="form-select" [(ngModel)]="paymentForm.plan_type">
+                <option *ngFor="let plan of planTypes" [value]="plan">{{ plan }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <select class="form-select" [(ngModel)]="paymentForm.billing_cycle">
+                <option *ngFor="let cycle of billingCycles" [value]="cycle">{{ cycle }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-md-12">
+              <input class="form-control" type="date" [(ngModel)]="paymentForm.paid_at" />
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm mt-2" (click)="createPayment()">Registrar pago</button>
+
+          <ul class="list-group mt-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let payment of payments">
+              <span>{{ payment.currency }} {{ payment.amount }} - {{ payment.paid_at | date:'yyyy-MM-dd' }}</span>
+              <button class="btn btn-sm btn-outline-danger" (click)="voidPayment(payment)">Anular</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

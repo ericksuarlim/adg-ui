@@ -14,6 +14,11 @@ const routes: Routes = [
     path: 'cattle',
     loadChildren: () => import('./views/cattle/cattle.module').then((m) => m.CattleModule)
   },
+  {
+    path: 'saas-management',
+    loadChildren: () =>
+      import('./views/saas-management/saas-management.module').then((m) => m.SaasManagementModule)
+  },
   { path: '**', redirectTo: 'home' }
 ];
 
