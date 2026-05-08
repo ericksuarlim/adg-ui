@@ -1,0 +1,99 @@
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  z-index: 1025;
+  transform: translateX(0);
+  transition: transform .2s ease, width .2s ease, min-width .2s ease;
+}
+
+.sidebar-nav .components {
+  padding: .75rem 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  padding: .85rem 1rem .75rem;
+  gap: .1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand__eyebrow {
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.sidebar-brand__title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.sidebar-nav .components li a {
+  display: block;
+  padding: .56rem 1rem;
+  font-size: .84rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  border-radius: 0 .35rem .35rem 0;
+  margin-right: .4rem;
+}
+
+.sidebar-nav .components li a:hover {
+  background: var(--surface-secondary);
+  border-left-color: var(--primary);
+}
+
+.sidebar-nav .components li a.active {
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-nav .components li a i {
+  width: 14px;
+  text-align: center;
+}
+
+.sidebar-header {
+  padding: .75rem 1rem .38rem;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+@media (min-width: 992px) {
+  .sidebar:not(.active) {
+    transform: translateX(-100%);
+    width: 0;
+    min-width: 0;
+    border-right: 0;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: calc(100vh - 64px);
+    transform: translateX(-100%);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+}

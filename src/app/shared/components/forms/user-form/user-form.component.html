@@ -1,0 +1,56 @@
+<form class="user-form" (ngSubmit)="onSubmit()">
+  <div class="row g-2">
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-id-card">{{ 'userForm.idCard' | t }}</label>
+      <input id="user-id-card" class="form-control" [(ngModel)]="value.id_card" name="id_card"
+        (blur)="markTouched('id_card')" [class.is-invalid]="fieldInvalid('id_card')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('id_card')">{{ fieldError('id_card') }}</div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-first-name">{{ 'userForm.firstName' | t }}</label>
+      <input id="user-first-name" class="form-control" [(ngModel)]="value.first_name" name="first_name"
+        (blur)="markTouched('first_name')" [class.is-invalid]="fieldInvalid('first_name')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('first_name')">{{ fieldError('first_name') }}</div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-last-name">{{ 'userForm.lastName' | t }}</label>
+      <input id="user-last-name" class="form-control" [(ngModel)]="value.last_name" name="last_name"
+        (blur)="markTouched('last_name')" [class.is-invalid]="fieldInvalid('last_name')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('last_name')">{{ fieldError('last_name') }}</div>
+    </div>
+  </div>
+
+  <div class="row g-2 mt-1">
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-email">{{ 'common.email' | t }}</label>
+      <input id="user-email" class="form-control" [(ngModel)]="value.email" name="email" (blur)="markTouched('email')"
+        [class.is-invalid]="fieldInvalid('email')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('email')">{{ fieldError('email') }}</div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-username">{{ 'common.username' | t }}</label>
+      <input id="user-username" class="form-control" [(ngModel)]="value.username" name="username"
+        (blur)="markTouched('username')" [class.is-invalid]="fieldInvalid('username')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('username')">{{ fieldError('username') }}</div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="user-role">{{ 'userForm.role' | t }}</label>
+      <select id="user-role" class="form-select" [(ngModel)]="value.role" name="role"
+        (blur)="markTouched('role')" [disabled]="roleDisabled" [class.is-invalid]="fieldInvalid('role')">
+        <option *ngFor="let role of availableRoles" [value]="role">{{ ('roles.' + role) | t }}</option>
+      </select>
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('role')">{{ fieldError('role') }}</div>
+    </div>
+    <div class="col-md-4" *ngIf="showPassword">
+      <label class="form-label mb-1" for="user-password">{{ 'common.password' | t }}</label>
+      <input id="user-password" class="form-control" type="password" [(ngModel)]="value.password" name="password"
+        (blur)="markTouched('password')" [class.is-invalid]="fieldInvalid('password')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('password')">{{ fieldError('password') }}</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mt-3">
+    <button type="submit" class="btn btn-primary" [disabled]="loading">{{ submitLabelKey | t }}</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">{{ cancelLabelKey | t }}</button>
+  </div>
+</form>

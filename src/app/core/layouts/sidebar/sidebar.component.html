@@ -1,0 +1,53 @@
+<aside class="sidebar" [class.active]="classApplied">
+    <div class="sidebar-brand">
+        <span class="sidebar-brand__eyebrow">Operations</span>
+        <span class="sidebar-brand__title">CattlePro</span>
+    </div>
+    <nav class="sidebar-nav">	
+        <ul class="list-unstyled components">	
+            <li class="sidebar-header">Core</li>
+            <li>	
+                <a routerLink="/animal" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-grid-1x2 me-2"></i>{{ 'sidebar.animal' | t }}</a>
+            </li>	
+            <ng-container *ngIf="hasAdministrationSection">
+                <li class="sidebar-header">{{ 'sidebar.administration' | t }}</li>
+                <li *ngIf="canAccessCompanies">
+                    <a routerLink="/saas-management" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-buildings me-2"></i>{{ 'sidebar.companies' | t }}</a>
+                </li>
+                <li *ngIf="canAccessUsers">
+                    <a routerLink="/user-management" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-people me-2"></i>{{ 'sidebar.users' | t }}</a>
+                </li>
+            </ng-container>
+            <li class="sidebar-header">Field Ops</li>
+            <li>	
+                <a href="#"><i class="bi bi-droplet me-2"></i>{{ 'sidebar.dairy' | t }}</a>	
+            </li>	
+            <li>	
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="bi bi-clipboard2-pulse me-2"></i>{{ 'sidebar.attendance' | t }}</a>	
+                <ul class="collapse list-unstyled" id="pageSubmenu">	
+                    <li>	
+                        <a href="#">{{ 'sidebar.active' | t }}</a>	
+                    </li>	
+                    <li>	
+                        <a href="#">{{ 'sidebar.idle' | t }}</a>	
+                    </li>	
+                    <li>	
+                        <a href="#">{{ 'sidebar.nonActive' | t }}</a>	
+                    </li>	
+                </ul>	
+            </li>	
+            <li>	
+                <a href="#"><i class="bi bi-heart-pulse me-2"></i>{{ 'sidebar.healthService' | t }}</a>	
+            </li>	
+            <li>	
+                <a href="#"><i class="bi bi-truck me-2"></i>{{ 'sidebar.distribution' | t }}</a>	
+            </li>	
+            <li>	
+                <a href="#"><i class="bi bi-motherboard me-2"></i>{{ 'sidebar.maternity' | t }}</a>	
+            </li>	
+            <li>	
+                <a href="#"><i class="bi bi-card-checklist me-2"></i>{{ 'sidebar.registration' | t }}</a>	
+            </li>	
+        </ul>	
+    </nav>
+</aside>

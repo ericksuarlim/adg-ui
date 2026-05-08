@@ -1,0 +1,38 @@
+<nav class="navbar navbar-expand-lg app-navbar">
+    <div class="container-fluid px-3">
+        <button class="navbar__btn-toggler-sidebar btn" type="button" id="sidebarCollapse" (click)="toggleSidebar()" >	
+            <i class="bi bi-layout-text-sidebar-reverse"></i>
+        </button> 
+        <a class="navbar-brand me-2" href="/home">
+            <img
+                src="../../../../assets/logo_navbar.jpg"
+                alt="Logo ADG"
+                class="navbar__logo-navbar"
+            />
+        </a> 
+        <button class="navbar__btn-toggler-navbar navbar-toggler" type="button" (click)="toggleNavbar()" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="navbar__options--right collapse navbar-collapse" [ngbCollapse]="isNavbarCollapsed">
+            <div class="d-flex align-items-center flex-wrap gap-2 ms-auto navbar__controls">
+                <span class="navbar__membership">
+                    <i class="bi bi-calendar-check me-1"></i>{{ membershipStatus }} | {{ renewalDateLabel }} | {{ remainingDaysLabel }}
+                </span>
+                <label for="language-selector" class="navbar__label mb-0">{{ 'common.language' | t }}</label>
+                <select id="language-selector" class="navbar__language-select" [ngModel]="currentLanguage" (ngModelChange)="changeLanguage($event)">
+                    <option *ngFor="let language of languages" [ngValue]="language.code">{{ language.label }}</option>
+                </select>
+                <div class="btn-group" role="group" aria-label="Theme selection">
+                    <button type="button" class="navbar__btn-dark btn" (click)="setTheme('dark')"><i class="bi bi-moon"></i></button>
+                    <button type="button" class="navbar__btn-light btn" (click)="setTheme('light')"><i class="bi bi-sun"></i></button>
+                </div>
+                <div ngbDropdown class="dropdown navbar__dropdown__btn-profile">
+                    <button ngbDropdownToggle type="button" class="navbar__btn-profile btn" id="dropdownButton" ><i class="bi bi-person-circle"></i> {{ username }}</button>
+                    <div ngbDropdownMenu class="navbar__dropdown__group"  aria-labelledby="dropdownButton">
+                        <button type="button" class="navbar__dropdown__group_logout-btn btn dropdown-item" (click)="Logout()"><i class="bi bi-person-lock"></i> {{ 'common.logout' | t }}</button>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</nav>

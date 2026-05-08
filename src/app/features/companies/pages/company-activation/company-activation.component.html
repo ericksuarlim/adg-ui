@@ -1,0 +1,77 @@
+<div class="container-fluid company-activation">
+  <div class="app-page-header d-flex justify-content-between align-items-center">
+    <h3 class="app-page-title mb-0">{{ 'saas.activationTitle' | t }}</h3>
+    <a class="btn btn-outline-secondary btn-sm" routerLink="/saas-management">{{ 'common.back' | t }}</a>
+  </div>
+
+  <p class="text-danger mt-2" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="app-card p-3 mt-3" *ngIf="company">
+    <h5 class="mb-3">{{ 'saas.paidActivationTitle' | t }} - {{ company.name }}</h5>
+    <div class="row g-2">
+      <div class="col-md-4">
+        <label class="form-label mb-1" for="payment-currency">{{ 'saas.currency' | t }}</label>
+        <input id="payment-currency" class="form-control" value="BOB" readonly />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label mb-1" for="payment-method">{{ 'saas.method' | t }}</label>
+        <select id="payment-method" class="form-select" [(ngModel)]="paymentForm.payment_method">
+          <option *ngFor="let method of paymentMethods" [value]="method">{{ getPaymentMethodLabel(method) }}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label mb-1" for="payment-amount">{{ 'saas.amount' | t }}</label>
+        <input id="payment-amount" class="form-control" [value]="calculatedAmountBs" readonly />
+      </div>
+    </div>
+    <div class="row g-2 mt-2">
+      <div class="col-md-6">
+        <label class="form-label mb-1" for="payment-plan">{{ 'saas.plan' | t }}</label>
+        <select id="payment-plan" class="form-select" [(ngModel)]="paymentForm.plan_type">
+          <option *ngFor="let plan of planTypes" [value]="plan">{{ getPlanLabel(plan) }}</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label mb-1" for="payment-cycle">{{ 'saas.cycle' | t }}</label>
+        <select id="payment-cycle" class="form-select" [(ngModel)]="paymentForm.billing_cycle">
+          <option *ngFor="let cycle of billingCycles" [value]="cycle">{{ getBillingCycleLabel(cycle) }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="row g-2 mt-2">
+      <div class="col-md-12">
+        <label class="form-label mb-1" for="payment-date">{{ 'saas.paymentDate' | t }}</label>
+        <input id="payment-date" class="form-control" type="date" [(ngModel)]="paymentForm.paid_at" />
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm mt-3" (click)="createPayment()" [disabled]="hasActivePaidSubscription">
+      {{ 'saas.registerPayment' | t }}
+    </button>
+    <div class="text-muted mt-2" *ngIf="hasActivePaidSubscription">{{ 'saas.activeSubscriptionLocked' | t }}</div>
+
+    <ul class="list-group mt-3">
+      <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let payment of payments">
+        <span>{{ payment.currency }} {{ payment.amount }} - {{ payment.paid_at | date:'yyyy-MM-dd' }}</span>
+        <span class="badge bg-secondary">{{ payment.status }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="app-card p-3 mt-3" *ngIf="company">
+    <h5 class="mb-3">{{ 'saas.trialActivationTitle' | t }}</h5>
+    <div class="row g-2">
+      <div class="col-md-6">
+        <label class="form-label mb-1" for="trial-start">{{ 'saas.trialStartDate' | t }}</label>
+        <input id="trial-start" class="form-control" type="date" [(ngModel)]="trialForm.trial_start_date" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label mb-1" for="trial-end">{{ 'saas.trialEndDate' | t }}</label>
+        <input id="trial-end" class="form-control" type="date" [(ngModel)]="trialForm.trial_end_date" />
+      </div>
+    </div>
+    <button class="btn btn-outline-primary btn-sm mt-3" (click)="activateTrial()" [disabled]="hasActivePaidSubscription">
+      {{ 'saas.activateTrial' | t }}
+    </button>
+    <div class="text-muted mt-2" *ngIf="hasActivePaidSubscription">{{ 'saas.activeSubscriptionLocked' | t }}</div>
+  </div>
+</div>

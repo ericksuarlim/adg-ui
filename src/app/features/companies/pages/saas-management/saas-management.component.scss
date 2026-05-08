@@ -1,0 +1,38 @@
+.saas-management {
+  padding-top: .35rem;
+}
+
+.saas-management .card-header {
+  font-weight: 600;
+}
+
+.list-group-item {
+  border-color: var(--border);
+  font-size: .83rem;
+  padding: .55rem .75rem;
+}
+
+.saas-management .app-card {
+  border-radius: .45rem;
+}
+
+.saas-management .alert {
+  border-radius: .35rem;
+  margin-bottom: .5rem;
+}
+
+.saas-management .form-check-label {
+  font-size: .82rem;
+  color: var(--text-secondary);
+}
+
+.saas-management .app-table + .d-flex {
+  border-top: 1px solid var(--border);
+  padding-top: .6rem;
+}
+
+.saas-management .btn-outline-secondary,
+.saas-management .btn-outline-danger,
+.saas-management .btn-outline-primary {
+  border-width: 1px;
+}

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AutenticacionGuard } from './commons/autentication.guard';
-import { ShowLogin } from './commons/showLogin';
-import { HomeComponent } from './views/home/home.component';
-import { LoginComponent } from './views/login/login/login.component';
+import { AutenticacionGuard } from './core/guards/autentication.guard';
+import { ShowLogin } from './core/guards/show-login.guard';
+import { HomeComponent } from './features/home/pages/home/home.component';
+import { LoginComponent } from './features/auth/pages/login/login.component';
 
 
 const routes: Routes = [
@@ -11,13 +11,18 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [ShowLogin] },
   { path: 'home', component: HomeComponent, canActivate: [AutenticacionGuard] },
   {
-    path: 'cattle',
-    loadChildren: () => import('./views/cattle/cattle.module').then((m) => m.CattleModule)
+    path: 'animal',
+    loadChildren: () => import('./features/animals/animal.module').then((m) => m.AnimalModule)
   },
   {
     path: 'saas-management',
     loadChildren: () =>
-      import('./views/saas-management/saas-management.module').then((m) => m.SaasManagementModule)
+      import('./features/companies/company.module').then((m) => m.CompanyModule)
+  },
+  {
+    path: 'user-management',
+    loadChildren: () =>
+      import('./features/users/user-management.module').then((m) => m.UserManagementModule)
   },
   { path: '**', redirectTo: 'home' }
 ];

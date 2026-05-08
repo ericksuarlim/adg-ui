@@ -1,0 +1,30 @@
+.home-dashboard {
+  padding-top: .25rem;
+}
+
+.home-module-card {
+  border: 1px solid var(--border);
+  transition: transform .2s ease, border-color .2s ease, background-color .2s ease;
+}
+
+.home-module-card .card-header {
+  text-align: left;
+}
+
+.home-module-card .card-text {
+  color: var(--text-secondary);
+  font-size: .84rem;
+}
+
+.home-module-card__image {
+  width: 100%;
+  border-radius: .35rem;
+  border: 1px solid var(--border);
+}
+
+.home-module-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  background: var(--surface);
+  cursor: pointer;
+}

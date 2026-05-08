@@ -1,0 +1,85 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import {
+  ApiItemResponse,
+  ApiListResponse,
+  CompanyOption,
+  MembershipItem,
+  RanchOption,
+  UserManagementItem,
+  UserManagementPayload
+} from '../models/user-management.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserManagementService {
+  private readonly userUrl = `${environment.urlApi}/user`;
+  private readonly companyUrl = `${environment.urlApi}/company`;
+  private readonly ranchUrl = `${environment.urlApi}/ranch`;
+  private readonly membershipUrl = `${environment.urlApi}/membership`;
+
+  constructor(private readonly http: HttpClient) {}
+
+  getUsers(uuidCompany?: string): Observable<UserManagementItem[]> {
+    const query = uuidCompany ? `?uuid_company=${uuidCompany}` : '';
+    return this.http
+      .get<ApiListResponse<UserManagementItem>>(`${this.userUrl}${query}`)
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  getUserById(uuidUser: string): Observable<UserManagementItem> {
+    return this.http
+      .get<ApiItemResponse<UserManagementItem>>(`${this.userUrl}/${uuidUser}`)
+      .pipe(map((response) => response.data));
+  }
+
+  createUser(payload: UserManagementPayload): Observable<UserManagementItem> {
+    return this.http
+      .post<ApiItemResponse<UserManagementItem>>(this.userUrl, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  updateUser(uuidUser: string, payload: UserManagementPayload): Observable<UserManagementItem> {
+    return this.http
+      .put<ApiItemResponse<UserManagementItem>>(`${this.userUrl}/${uuidUser}`, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  deactivateUser(uuidUser: string): Observable<unknown> {
+    return this.http.delete(`${this.userUrl}/${uuidUser}`);
+  }
+
+  getCompanies(): Observable<CompanyOption[]> {
+    return this.http
+      .get<ApiListResponse<CompanyOption>>(this.companyUrl)
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  getRanches(uuidCompany?: string): Observable<RanchOption[]> {
+    const query = uuidCompany ? `?uuid_company=${uuidCompany}` : '';
+    return this.http
+      .get<ApiListResponse<RanchOption>>(`${this.ranchUrl}${query}`)
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  getMembershipsByRanch(uuidRanch: string): Observable<MembershipItem[]> {
+    return this.http
+      .get<ApiListResponse<MembershipItem>>(`${this.membershipUrl}/ranch/${uuidRanch}`)
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  assignMembership(uuidUser: string, uuidRanch: string, role: string): Observable<unknown> {
+    return this.http.post(this.membershipUrl, {
+      uuid_user: uuidUser,
+      uuid_ranch: uuidRanch,
+      role
+    });
+  }
+
+  updateMembershipRole(uuidUser: string, uuidRanch: string, role: string): Observable<unknown> {
+    return this.http.put(`${this.membershipUrl}/${uuidUser}/${uuidRanch}`, { role });
+  }
+}

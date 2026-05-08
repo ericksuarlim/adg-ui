@@ -15,6 +15,24 @@
       "request": "launch",
       "preLaunchTask": "npm: test",
       "url": "http://localhost:9876/debug.html"
+    },
+    {
+      "name": "Attach ADG API (Docker :9230)",
+      "type": "node",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9230,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/../adg-api/src",
+      "remoteRoot": "/app/src",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "UI + API Debug",
+      "configurations": ["ng serve", "Attach ADG API (Docker :9230)"]
     }
   ]
 }

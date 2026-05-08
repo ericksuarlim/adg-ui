@@ -1,0 +1,9 @@
+.code-sender-modal__box {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: .35rem;
+  padding: .4rem .55rem;
+}

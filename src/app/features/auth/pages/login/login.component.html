@@ -1,0 +1,38 @@
+<div class="login-page">
+    <div class="container-fluid login__container">
+        <div class="login__card app-card">
+            <div class="login__brand">CattlePro</div>
+            <h1 class="mb-1">{{ 'login.title' | t }}</h1>
+            <h3 class="mb-4">{{ 'login.subtitle' | t }}</h3>
+
+            <div class="form-group mb-2">
+                <label class="form-label" for="user_name">{{ 'login.usernamePlaceholder' | t }}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" name="user_name" id="user_name" class="form-control"
+                        [placeholder]="'login.usernamePlaceholder' | t" [(ngModel)]="user_name"
+                        (ngModelChange)="ValidateData('check')">
+                </div>
+                <div *ngIf="!validation.user_name" class="text-danger mt-1">{{ errorValidationMessage.user_name }}</div>
+            </div>
+
+            <div class="form-group mb-2">
+                <label class="form-label" for="password">{{ 'login.passwordPlaceholder' | t }}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                    <input [type]="see_password ? 'text' : 'password'" name="password" id="password" class="form-control"
+                        [placeholder]="'login.passwordPlaceholder' | t" [(ngModel)]="password"
+                        (ngModelChange)="ValidateData('check')">
+                </div>
+                <div *ngIf="!validation.password" class="text-danger mt-1">{{ errorValidationMessage.password }}</div>
+            </div>
+
+            <button (click)="Login()" type="submit" class="login__enter-button btn btn-primary w-100 mb-3">{{ 'login.button' | t }}</button>
+
+            <div class="d-flex justify-content-between login__links">
+                <a (click)="SeePassword()" href="#!">{{ 'login.seePassword' | t }}</a>
+                <a (click)="OpenCodeSenderModal()" href="#!">{{ 'login.forgotPassword' | t }}</a>
+            </div>
+        </div>
+    </div>
+</div>

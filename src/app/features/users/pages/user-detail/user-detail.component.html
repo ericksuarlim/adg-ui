@@ -1,0 +1,49 @@
+<div class="container-fluid user-detail">
+  <div class="app-page-header d-flex justify-content-between align-items-center">
+    <h3 class="app-page-title mb-0">{{ 'users.detailTitle' | t }}</h3>
+    <a class="btn btn-outline-secondary btn-sm" routerLink="/user-management">{{ 'common.back' | t }}</a>
+  </div>
+
+  <p class="text-danger mt-2" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="app-card p-3 mt-3" *ngIf="user">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'common.username' | t }}</div>
+        <div class="app-detail-value">{{ user.username }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'common.email' | t }}</div>
+        <div class="app-detail-value">{{ user.email }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'userForm.role' | t }}</div>
+        <div class="app-detail-value">{{ ('roles.' + (user.role || 'user')) | t }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'userForm.idCard' | t }}</div>
+        <div class="app-detail-value">{{ user.id_card }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'userForm.firstName' | t }}</div>
+        <div class="app-detail-value">{{ user.first_name }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'userForm.lastName' | t }}</div>
+        <div class="app-detail-value">{{ user.last_name }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'users.company' | t }}</div>
+        <div class="app-detail-value">{{ companyName }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-label mb-1">{{ 'common.status' | t }}</div>
+        <div class="app-detail-value">{{ user.is_active ? ('users.active' | t) : ('users.inactive' | t) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-card p-3 mt-3 text-muted" *ngIf="!isLoading && !user && !errorMessage">
+    {{ 'users.detailNotFound' | t }}
+  </div>
+</div>

@@ -1,20 +1,42 @@
-.body{
-    /* text-align:center;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh; */
+.app-shell {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text-primary);
 }
 
-.page__togler-button{
-    margin-bottom: -150px;
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - var(--header-height));
 }
 
-.pagee.active{
-    margin-left: 250px;
-    transition: all 0.3s;
+.app-main {
+  flex: 1;
+  overflow-x: hidden;
 }
 
-.pagee{
-    transition: all 0.3s;
+.app-main-guest {
+  min-height: 100vh;
+}
+
+.app-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .app-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: var(--header-height) 0 0 0;
+    background: rgba(17, 24, 39, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    z-index: 1020;
+  }
+
+  .app-sidebar-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 

@@ -1,9 +1,22 @@
-<div class="body">
-  <app-navbar class="dark-theme" *ngIf="user!=null" (toggleSidebarToParent)="toggleSidebarToParent($event)"></app-navbar>
-  <div class="page-content">
-    <app-sidebar class="dark-theme" *ngIf="user!=null" [toggleSidebarFromParent]="openSidebar"> </app-sidebar> 
-    <div class="pagee dark-theme" [class.active]="!openSidebar">
+<div class="app-shell" [ngClass]="{'theme-light': currentTheme === 'light', 'theme-dark': currentTheme === 'dark'}">
+  <app-navbar
+    *ngIf="user != null"
+    [isSidebarOpen]="openSidebar"
+    (toggleSidebarToParent)="toggleSidebarToParent($event)"
+    (themeChanged)="onThemeChange($event)"
+  ></app-navbar>
+
+  <div class="app-layout" *ngIf="user != null; else guestLayout">
+    <button type="button" class="app-sidebar-backdrop" [class.show]="openSidebar" (click)="openSidebar = false" aria-label="Close sidebar"></button>
+    <app-sidebar [classApplied]="openSidebar" (sidebarLinkClicked)="openSidebar = false"></app-sidebar>
+    <main class="app-main">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </div>
+
+  <ng-template #guestLayout>
+    <main class="app-main app-main-guest">
+      <router-outlet></router-outlet>
+    </main>
+  </ng-template>
 </div>
