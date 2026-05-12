@@ -1,3 +1,33 @@
 :host {
   display: block;
 }
+
+.company-activation__fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.company-activation__readonly {
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.company-activation__fieldset:disabled .btn.btn-primary,
+.company-activation__fieldset[disabled] .btn.btn-primary {
+  background-color: var(--surface-secondary, #6c757d);
+  border-color: var(--surface-border, #6c757d);
+  color: var(--text-secondary, #fff);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.company-activation__fieldset:disabled .btn.btn-outline-primary,
+.company-activation__fieldset[disabled] .btn.btn-outline-primary {
+  color: var(--text-secondary);
+  border-color: var(--surface-border);
+  background-color: transparent;
+  opacity: 0.75;
+  pointer-events: none;
+}

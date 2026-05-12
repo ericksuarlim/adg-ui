@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -22,9 +22,10 @@ export class SaasManagementService {
   constructor(private readonly http: HttpClient) {}
 
   getCompanies(): Observable<CompanyManagement[]> {
-    return this.http.get<ApiListResponse<CompanyManagement>>(this.companyUrl).pipe(
-      map((response) => response.data ?? [])
-    );
+    const params = new HttpParams().set('status', 'all').set('page', '1').set('size', '500');
+    return this.http
+      .get<ApiListResponse<CompanyManagement>>(this.companyUrl, { params })
+      .pipe(map((response) => response.data ?? []));
   }
 
   createCompany(payload: Partial<CompanyManagement>): Observable<CompanyManagement> {
@@ -41,6 +42,18 @@ export class SaasManagementService {
 
   deactivateCompany(uuidCompany: string): Observable<unknown> {
     return this.http.delete(`${this.companyUrl}/${uuidCompany}`);
+  }
+
+  reactivateCompany(uuidCompany: string): Observable<CompanyManagement> {
+    return this.http
+      .post<ApiItemResponse<CompanyManagement>>(`${this.companyUrl}/${uuidCompany}/reactivate`, {})
+      .pipe(map((response) => response.data as CompanyManagement));
+  }
+
+  endCompanySubscription(uuidCompany: string): Observable<CompanyManagement> {
+    return this.http
+      .post<ApiItemResponse<CompanyManagement>>(`${this.companyUrl}/${uuidCompany}/end-subscription`, {})
+      .pipe(map((response) => response.data as CompanyManagement));
   }
 
   getCompanyUsers(uuidCompany: string): Observable<CompanyUser[]> {

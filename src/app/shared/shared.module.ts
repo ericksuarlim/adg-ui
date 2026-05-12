@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { UserFormComponent } from './components/forms/user-form/user-form.component';
+import { ConfirmDialogComponent } from './components/modals/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
-  declarations: [TranslatePipe, UserFormComponent],
+  declarations: [TranslatePipe, UserFormComponent, ConfirmDialogComponent],
   imports: [CommonModule, FormsModule],
-  exports: [TranslatePipe, UserFormComponent]
+  exports: [TranslatePipe, UserFormComponent, ConfirmDialogComponent]
 })
 export class SharedModule {}

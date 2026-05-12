@@ -52,10 +52,12 @@ export interface CompanyPayment {
 export interface CompanyPaidActivationPayload {
   plan_type: CompanyPlanType;
   billing_cycle: BillingCycle;
+  amount?: number;
   payment_method: PaymentMethod;
   payment_reference?: string | null;
   notes?: string | null;
   paid_at: string;
+  period_start?: string | null;
 }
 
 export interface CompanyTrialActivationPayload {

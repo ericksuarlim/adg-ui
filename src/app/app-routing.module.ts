@@ -9,20 +9,28 @@ import { LoginComponent } from './features/auth/pages/login/login.component';
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'login', component: LoginComponent, canActivate: [ShowLogin] },
-  { path: 'home', component: HomeComponent, canActivate: [AutenticacionGuard] },
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [AutenticacionGuard],
+    data: { breadcrumb: 'breadcrumbs.home' }
+  },
   {
     path: 'animal',
-    loadChildren: () => import('./features/animals/animal.module').then((m) => m.AnimalModule)
+    loadChildren: () => import('./features/animals/animal.module').then((m) => m.AnimalModule),
+    data: { breadcrumb: 'breadcrumbs.animal' }
   },
   {
     path: 'saas-management',
     loadChildren: () =>
-      import('./features/companies/company.module').then((m) => m.CompanyModule)
+      import('./features/companies/company.module').then((m) => m.CompanyModule),
+    data: { breadcrumb: 'breadcrumbs.saasManagement' }
   },
   {
     path: 'user-management',
     loadChildren: () =>
-      import('./features/users/user-management.module').then((m) => m.UserManagementModule)
+      import('./features/users/user-management.module').then((m) => m.UserManagementModule),
+    data: { breadcrumb: 'breadcrumbs.userManagement' }
   },
   { path: '**', redirectTo: 'home' }
 ];

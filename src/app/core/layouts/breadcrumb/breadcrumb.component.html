@@ -1,0 +1,20 @@
+<div class="app-content-header" *ngIf="showBreadcrumb">
+  <div class="container-fluid">
+    <div class="breadcrumb-wrapper">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item" *ngFor="let breadcrumbItem of breadcrumbItems">
+          <a *ngIf="!breadcrumbItem.active" [routerLink]="breadcrumbItem.url">
+            {{ breadcrumbItem.label }}
+          </a>
+          <span *ngIf="breadcrumbItem.active" class="active" aria-current="page">
+            {{ breadcrumbItem.label }}
+          </span>
+        </li>
+      </ol>
+
+      <button type="button" class="btn btn-outline-secondary btn-sm breadcrumb-back-btn" (click)="goBack()">
+        {{ 'common.back' | t }}
+      </button>
+    </div>
+  </div>
+</div>

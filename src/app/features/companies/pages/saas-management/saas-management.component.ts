@@ -1,8 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CompanyManagement } from '../../models/company-management.model';
 import { SaasManagementService } from '../../services/saas-management.service';
 import { I18nService } from 'src/app/core/services/i18n.service';
+import { ConfirmDialogComponent } from 'src/app/shared/components/modals/confirm-dialog/confirm-dialog.component';
 import { BillingCycle, CompanyPlanType, MembershipStatus } from 'src/app/shared/constants/domain.constants';
+import {
+  companyCanArchive,
+  companyCanEndSubscription,
+  companyCanReactivate,
+  companyIsArchived,
+  companySubscriptionLooksInactive
+} from '../../utils/company-subscription-display';
 
 @Component({
   selector: 'app-saas-management',
@@ -14,6 +23,7 @@ export class SaasManagementComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   companySearch = '';
+  companyArchiveFilter: 'all' | 'active' | 'archived' = 'all';
   companyPage = 1;
   readonly companyPageSize = 8;
 
@@ -32,6 +42,7 @@ export class SaasManagementComponent implements OnInit {
   companyFormTouched: Record<string, boolean> = {};
 
   constructor(
+    private readonly modalService: NgbModal,
     private readonly saasManagementService: SaasManagementService,
     private readonly i18nService: I18nService
   ) {}
@@ -91,15 +102,103 @@ export class SaasManagementComponent implements OnInit {
     });
   }
 
-  deactivateCompany(company: CompanyManagement): void {
-    this.saasManagementService.deactivateCompany(company.uuid_company).subscribe({
-      next: () => {
-        this.loadCompanies();
+  companyRowIsArchived(company: CompanyManagement): boolean {
+    return companyIsArchived(company);
+  }
+
+  companyRowSubscriptionInactive(company: CompanyManagement): boolean {
+    return companySubscriptionLooksInactive(company);
+  }
+
+  canEndSubscription(company: CompanyManagement): boolean {
+    return companyCanEndSubscription(company);
+  }
+
+  canArchiveCompany(company: CompanyManagement): boolean {
+    return companyCanArchive(company);
+  }
+
+  canReactivateCompany(company: CompanyManagement): boolean {
+    return companyCanReactivate(company);
+  }
+
+  onCompanyArchiveFilterChange(value: string): void {
+    if (value === 'all' || value === 'active' || value === 'archived') {
+      this.companyArchiveFilter = value;
+      this.companyPage = 1;
+    }
+  }
+
+  openReactivateCompanyModal(company: CompanyManagement): void {
+    const modalRef = this.modalService.open(ConfirmDialogComponent, { centered: true, backdrop: 'static' });
+    const dialog = modalRef.componentInstance as ConfirmDialogComponent;
+    dialog.titleKey = 'saas.reactivateCompany';
+    dialog.messageKey = 'saas.reactivateCompanyConfirm';
+    dialog.confirmKey = 'common.confirm';
+    dialog.cancelKey = 'common.cancel';
+    dialog.confirmButtonClass = 'btn-success';
+
+    modalRef.result.then(
+      () => {
+        this.saasManagementService.reactivateCompany(company.uuid_company).subscribe({
+          next: () => {
+            this.loadCompanies();
+          },
+          error: () => {
+            this.errorMessage = this.i18nService.translate('errors.reactivateCompany');
+          }
+        });
       },
-      error: () => {
-        this.errorMessage = this.i18nService.translate('errors.deactivateCompany');
-      }
-    });
+      () => undefined
+    );
+  }
+
+  openArchiveCompanyModal(company: CompanyManagement): void {
+    const modalRef = this.modalService.open(ConfirmDialogComponent, { centered: true, backdrop: 'static' });
+    const dialog = modalRef.componentInstance as ConfirmDialogComponent;
+    dialog.titleKey = 'saas.archiveCompany';
+    dialog.messageKey = 'saas.archiveCompanyConfirm';
+    dialog.confirmKey = 'common.confirm';
+    dialog.cancelKey = 'common.cancel';
+    dialog.confirmButtonClass = 'btn-dark';
+
+    modalRef.result.then(
+      () => {
+        this.saasManagementService.deactivateCompany(company.uuid_company).subscribe({
+          next: () => {
+            this.loadCompanies();
+          },
+          error: () => {
+            this.errorMessage = this.i18nService.translate('errors.deactivateCompany');
+          }
+        });
+      },
+      () => undefined
+    );
+  }
+
+  openEndSubscriptionModal(company: CompanyManagement): void {
+    const modalRef = this.modalService.open(ConfirmDialogComponent, { centered: true, backdrop: 'static' });
+    const dialog = modalRef.componentInstance as ConfirmDialogComponent;
+    dialog.titleKey = 'saas.endSubscription';
+    dialog.messageKey = 'saas.endSubscriptionConfirm';
+    dialog.confirmKey = 'common.confirm';
+    dialog.cancelKey = 'common.cancel';
+    dialog.confirmButtonClass = 'btn-danger';
+
+    modalRef.result.then(
+      () => {
+        this.saasManagementService.endCompanySubscription(company.uuid_company).subscribe({
+          next: () => {
+            this.loadCompanies();
+          },
+          error: () => {
+            this.errorMessage = this.i18nService.translate('errors.endSubscription');
+          }
+        });
+      },
+      () => undefined
+    );
   }
 
   get canSaveCompany(): boolean {
@@ -183,11 +282,18 @@ export class SaasManagementComponent implements OnInit {
   }
 
   get filteredCompanies(): CompanyManagement[] {
+    let list = this.companies;
+    if (this.companyArchiveFilter === 'active') {
+      list = list.filter((company) => company.is_active);
+    } else if (this.companyArchiveFilter === 'archived') {
+      list = list.filter((company) => !company.is_active);
+    }
+
     const query = this.companySearch.trim().toLowerCase();
     if (!query) {
-      return this.companies;
+      return list;
     }
-    return this.companies.filter((company) =>
+    return list.filter((company) =>
       company.name?.toLowerCase().includes(query) ||
       company.legal_name?.toLowerCase().includes(query) ||
       company.tax_id?.toLowerCase().includes(query)

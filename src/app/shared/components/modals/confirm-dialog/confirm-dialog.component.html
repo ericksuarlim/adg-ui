@@ -1,0 +1,11 @@
+<div class="modal-header">
+  <h4 class="modal-title mb-0">{{ titleKey | t }}</h4>
+  <button type="button" class="btn-close" [attr.aria-label]="'common.closeForm' | t" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <p class="mb-0">{{ messageKey | t }}</p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">{{ cancelKey | t }}</button>
+  <button type="button" [ngClass]="confirmButtonClass" (click)="activeModal.close(true)">{{ confirmKey | t }}</button>
+</div>

@@ -33,8 +33,10 @@ export class CompanyActivationComponent implements OnInit {
     payment_reference: '',
     notes: '',
     paid_at: new Date().toISOString().slice(0, 10),
+    period_start: new Date().toISOString().slice(0, 10),
     plan_type: 'BASIC',
-    billing_cycle: 'MONTHLY'
+    billing_cycle: 'MONTHLY',
+    amount: PLAN_PRICES_BS.BASIC
   };
 
   trialForm = {
@@ -65,6 +67,14 @@ export class CompanyActivationComponent implements OnInit {
     return monthlyPrice;
   }
 
+  get estimatedMonthlyAmountBs(): number {
+    return PLAN_PRICES_BS[this.paymentForm.plan_type];
+  }
+
+  get estimatedAnnualAmountBs(): number {
+    return Number((this.estimatedMonthlyAmountBs * 12 * (1 - ANNUAL_DISCOUNT_PERCENT / 100)).toFixed(2));
+  }
+
   get hasActivePaidSubscription(): boolean {
     if (this.company?.membership_status !== 'ACTIVE') {
       return false;
@@ -75,11 +85,27 @@ export class CompanyActivationComponent implements OnInit {
     return new Date(this.company.membership_renewal_at).getTime() >= Date.now();
   }
 
+  get isPaidActivationFormLocked(): boolean {
+    return this.hasActivePaidSubscription;
+  }
+
   createPayment(): void {
     if (!this.company) {
       return;
     }
-    this.saasManagementService.createCompanyPayment(this.company.uuid_company, this.paymentForm).subscribe({
+    if (this.isPaidActivationFormLocked) {
+      return;
+    }
+
+    const validationKey = this.getActivationPaymentValidationErrorKey();
+    if (validationKey) {
+      this.errorMessage = this.i18nService.translate(validationKey);
+      return;
+    }
+
+    this.errorMessage = '';
+    const payload = this.buildActivationPaymentPayload();
+    this.saasManagementService.createCompanyPayment(this.company.uuid_company, payload).subscribe({
       next: () => {
         if (this.company) {
           this.company.membership_status = 'ACTIVE';
@@ -92,6 +118,10 @@ export class CompanyActivationComponent implements OnInit {
         this.errorMessage = this.i18nService.translate('errors.subscriptionAlreadyActive');
       }
     });
+  }
+
+  onPlanOrCycleChanged(): void {
+    this.paymentForm.amount = this.calculatedAmountBs;
   }
 
   activateTrial(): void {
@@ -127,6 +157,42 @@ export class CompanyActivationComponent implements OnInit {
     return this.i18nService.translate(`saas.paymentMethod.${method}`);
   }
 
+  private getActivationPaymentValidationErrorKey(): string | null {
+    if (!this.paymentForm.plan_type || !this.planTypes.includes(this.paymentForm.plan_type)) {
+      return 'saas.validation.activationPlanRequired';
+    }
+    if (!this.paymentForm.billing_cycle || !this.billingCycles.includes(this.paymentForm.billing_cycle)) {
+      return 'saas.validation.activationCycleRequired';
+    }
+    if (!this.paymentForm.payment_method || !this.paymentMethods.includes(this.paymentForm.payment_method)) {
+      return 'saas.validation.activationMethodRequired';
+    }
+    const paidAt = (this.paymentForm.paid_at ?? '').toString().trim();
+    if (!paidAt) {
+      return 'saas.validation.activationPaidAtRequired';
+    }
+    const periodStart = (this.paymentForm.period_start ?? '').toString().trim();
+    if (!periodStart) {
+      return 'saas.validation.activationStartRequired';
+    }
+    const amount = Number(this.paymentForm.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return 'saas.validation.activationAmountInvalid';
+    }
+    return null;
+  }
+
+  private buildActivationPaymentPayload(): CompanyPaidActivationPayload {
+    const reference = (this.paymentForm.payment_reference ?? '').toString().trim();
+    const notes = (this.paymentForm.notes ?? '').toString().trim();
+    return {
+      ...this.paymentForm,
+      amount: Number(this.paymentForm.amount),
+      payment_reference: reference.length > 0 ? reference : null,
+      notes: notes.length > 0 ? notes : null
+    };
+  }
+
   private loadCompany(uuidCompany: string): void {
     this.isLoading = true;
     this.saasManagementService.getCompanies().subscribe({
@@ -139,6 +205,7 @@ export class CompanyActivationComponent implements OnInit {
         }
         this.paymentForm.plan_type = this.company.plan_type;
         this.paymentForm.billing_cycle = this.company.billing_cycle;
+        this.paymentForm.amount = this.calculatedAmountBs;
         this.loadPayments(uuidCompany);
       },
       error: () => {

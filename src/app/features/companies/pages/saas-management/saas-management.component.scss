@@ -31,8 +31,22 @@
   padding-top: .6rem;
 }
 
+.saas-management__filter-select {
+  min-width: 11rem;
+  max-width: 16rem;
+}
+
 .saas-management .btn-outline-secondary,
 .saas-management .btn-outline-danger,
 .saas-management .btn-outline-primary {
   border-width: 1px;
+}
+
+.saas-management__row--inactive td {
+  color: var(--text-secondary);
+  background-color: var(--surface-secondary);
+}
+
+.saas-management__row--inactive td:first-child {
+  border-left: 3px solid var(--surface-border);
 }

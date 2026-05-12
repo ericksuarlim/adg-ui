@@ -1,0 +1,35 @@
+.app-content-header {
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  padding: .5rem 0;
+}
+
+.breadcrumb-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.breadcrumb {
+  margin: 0;
+  font-size: .875rem;
+}
+
+.breadcrumb-item a {
+  text-decoration: none;
+  color: var(--text-secondary);
+}
+
+.breadcrumb-item a:hover {
+  color: var(--text-primary);
+}
+
+.breadcrumb-item .active {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.breadcrumb-back-btn {
+  white-space: nowrap;
+}

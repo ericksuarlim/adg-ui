@@ -10,7 +10,10 @@ const routes: Routes = [
     path: '',
     component: AnimalComponent,
     canActivate: [AutenticacionGuard, PermissionGuard],
-    data: { permissions: [Permission.ANIMAL_READ] }
+    data: {
+      permissions: [Permission.ANIMAL_READ],
+      breadcrumb: 'breadcrumbs.list'
+    }
   }
 ];
 

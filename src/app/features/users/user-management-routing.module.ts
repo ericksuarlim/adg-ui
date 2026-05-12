@@ -12,7 +12,8 @@ const routes: Routes = [
     component: UserManagementComponent,
     canActivate: [AutenticacionGuard, PermissionGuard],
     data: {
-      permissions: [Permission.USER_READ]
+      permissions: [Permission.USER_READ],
+      breadcrumb: 'breadcrumbs.list'
     }
   },
   {
@@ -20,7 +21,8 @@ const routes: Routes = [
     component: UserDetailComponent,
     canActivate: [AutenticacionGuard, PermissionGuard],
     data: {
-      permissions: [Permission.USER_READ]
+      permissions: [Permission.USER_READ],
+      breadcrumb: 'breadcrumbs.detail'
     }
   }
 ];

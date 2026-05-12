@@ -11,6 +11,7 @@ import { HomeComponent } from './features/home/pages/home/home.component';
 import { NavbarComponent } from './core/layouts/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SidebarComponent } from './core/layouts/sidebar/sidebar.component';
+import { BreadcrumbComponent } from './core/layouts/breadcrumb/breadcrumb.component';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
@@ -26,7 +27,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
     CodeSenderModalComponent,
     HomeComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    BreadcrumbComponent
   ],
   imports: [
     BrowserModule,
