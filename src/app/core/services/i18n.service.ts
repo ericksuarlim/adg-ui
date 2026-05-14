@@ -101,12 +101,12 @@ const translations: Record<AppLanguage, Record<string, string>> = {
     'animal.optionalParen': '(opcional)',
     'animal.optionalParenShort': '(opc.)',
     'animal.formFieldsLegend':
-      '* campo obligatorio; (opcional) puede dejarse vacio. El ano de nacimiento es obligatorio (se envia como 1 de enero de ese ano).',
+      '* campo obligatorio; (opcional) puede dejarse vacío. El año de nacimiento es obligatorio (se envía como 1 de enero de ese año).',
     'animal.optionNone': 'Ninguno',
     'animal.fieldSex': 'Sexo',
     'animal.fieldColor': 'Color',
     'animal.fieldBirthDate': 'Fecha nacimiento',
-    'animal.fieldBirthYear': 'Ano de nacimiento',
+    'animal.fieldBirthYear': 'Año de nacimiento',
     'animal.fieldOriginType': 'Origen',
     'animal.fieldCurrentStatus': 'Estado',
     'animal.fieldDescription': 'Descripcion',
@@ -152,7 +152,7 @@ const translations: Record<AppLanguage, Record<string, string>> = {
     'animal.individualRegisterSubtitle':
       'Alta de animales nuevos: el estado y el alta logica los fija el sistema; el peso va en historial. Padres por numero de registro en el mismo rancho.',
     'animal.individualSave': 'Guardar animal',
-    'animal.individualInvalid': 'Completa rancho, numero de registro, raza y ano de nacimiento (4 digitos).',
+    'animal.individualInvalid': 'Completa rancho, número de registro, raza y año de nacimiento (4 dígitos).',
     'animal.individualSaveSuccess': 'Animal creado correctamente.',
     'animal.individualSaveError': 'No se pudo crear el animal.',
     'saas.title': 'Gestion de clientes SaaS',
