@@ -1,6 +1,39 @@
 <div class="container-fluid company-detail">
-  <div class="app-page-header d-flex align-items-center">
+  <div class="app-page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
     <h3 class="app-page-title mb-0">{{ 'saas.companyDetailTitle' | t }}</h3>
+    <div class="d-flex flex-wrap justify-content-end gap-2" *ngIf="company">
+      <button
+        *ngIf="canReactivateCompanyOnDetail"
+        type="button"
+        class="btn btn-success btn-sm"
+        (click)="openReactivateCompanyModal()"
+      >
+        {{ 'saas.reactivateCompany' | t }}
+      </button>
+      <a
+        *ngIf="company.is_active"
+        class="btn btn-primary btn-sm"
+        [routerLink]="['/saas-management', company.uuid_company, 'subscription']"
+      >
+        {{ 'saas.manageSubscription' | t }}
+      </a>
+      <button
+        *ngIf="canEndSubscriptionOnDetail"
+        type="button"
+        class="btn btn-outline-danger btn-sm"
+        (click)="openEndSubscriptionModal()"
+      >
+        {{ 'saas.endSubscription' | t }}
+      </button>
+      <button
+        *ngIf="canArchiveCompanyOnDetail"
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="openArchiveCompanyModal()"
+      >
+        {{ 'saas.archiveCompany' | t }}
+      </button>
+    </div>
   </div>
 
   <p class="text-danger mt-2" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -49,17 +82,21 @@
   <div class="app-card p-3 mt-3" *ngIf="company && canReadRanches">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">{{ 'saas.ranchesTitle' | t }}</h5>
-      <button *ngIf="canManageRanches" type="button" class="btn btn-primary btn-sm" (click)="toggleRanchForm()">
-        {{ showRanchForm ? ('common.closeForm' | t) : ('saas.createRanch' | t) }}
-      </button>
+      <a
+        *ngIf="canManageRanches"
+        class="btn btn-primary btn-sm"
+        [routerLink]="['/saas-management', company.uuid_company, 'ranches', 'new']"
+      >
+        {{ 'saas.createRanch' | t }}
+      </a>
     </div>
 
     <app-ranch-form
       *ngIf="showRanchForm && canManageRanches"
-      [mode]="ranchFormMode"
+      mode="edit"
       [value]="ranchForm"
       [loading]="isSavingRanch"
-      [submitLabelKey]="ranchFormMode === 'edit' ? 'users.update' : 'common.save'"
+      [submitLabelKey]="'users.update'"
       [cancelLabelKey]="'common.cancel'"
       (submitForm)="saveRanch($event)"
       (cancelForm)="cancelRanchForm()"
@@ -77,39 +114,6 @@
   </div>
 
   <div class="app-card p-3 mt-3" *ngIf="company">
-    <div class="d-flex flex-wrap justify-content-end gap-2 mb-3">
-      <button
-        *ngIf="canReactivateCompanyOnDetail"
-        type="button"
-        class="btn btn-success btn-sm"
-        (click)="openReactivateCompanyModal()"
-      >
-        {{ 'saas.reactivateCompany' | t }}
-      </button>
-      <a
-        *ngIf="company.is_active"
-        class="btn btn-primary btn-sm"
-        [routerLink]="['/saas-management', company.uuid_company, 'subscription']"
-      >
-        {{ 'saas.manageSubscription' | t }}
-      </a>
-      <button
-        *ngIf="canEndSubscriptionOnDetail"
-        type="button"
-        class="btn btn-outline-danger btn-sm"
-        (click)="openEndSubscriptionModal()"
-      >
-        {{ 'saas.endSubscription' | t }}
-      </button>
-      <button
-        *ngIf="canArchiveCompanyOnDetail"
-        type="button"
-        class="btn btn-outline-secondary btn-sm"
-        (click)="openArchiveCompanyModal()"
-      >
-        {{ 'saas.archiveCompany' | t }}
-      </button>
-    </div>
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">{{ 'users.list' | t }}</h5>
       <button class="btn btn-primary btn-sm" (click)="toggleCreateUserForm()">

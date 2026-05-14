@@ -36,7 +36,14 @@ export class RanchListComponent implements OnInit {
   }
 
   get selectedCompanyName(): string {
+    if (!this.selectedCompany?.trim()) {
+      return '';
+    }
     return this.companies.find((c) => c.uuid_company === this.selectedCompany)?.name ?? '';
+  }
+
+  companyNameForRanch(ranch: RanchOption): string {
+    return this.companies.find((c) => c.uuid_company === ranch.uuid_company)?.name ?? ranch.uuid_company;
   }
 
   onCompanyChange(uuid: string): void {
@@ -50,7 +57,7 @@ export class RanchListComponent implements OnInit {
     this.userManagementService.getCompanies().subscribe({
       next: (list) => {
         this.companies = list;
-        this.selectedCompany = list[0]?.uuid_company ?? '';
+        this.selectedCompany = '';
         this.loadRanchesForCompany();
       },
       error: () => {
@@ -61,12 +68,15 @@ export class RanchListComponent implements OnInit {
   }
 
   private loadRanchesForCompany(): void {
-    if (!this.selectedCompany) {
+    this.isLoading = true;
+    this.errorMessage = '';
+    const filter = this.isSaasOwner ? (this.selectedCompany.trim() || undefined) : this.selectedCompany;
+    if (!this.isSaasOwner && !filter) {
       this.ranches = [];
       this.isLoading = false;
       return;
     }
-    this.userManagementService.getRanches(this.selectedCompany).subscribe({
+    this.userManagementService.getRanches(filter).subscribe({
       next: (rows) => {
         this.ranches = rows;
         this.isLoading = false;

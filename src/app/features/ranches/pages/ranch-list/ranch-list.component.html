@@ -15,13 +15,27 @@
           [value]="selectedCompany"
           (change)="onCompanyChange($any($event.target).value)"
         >
+          <option value="">{{ 'users.allCompanies' | t }}</option>
           <option *ngFor="let c of companies" [value]="c.uuid_company">{{ c.name }}</option>
         </select>
+      </div>
+      <div class="col-md-auto ms-md-auto d-flex flex-column align-items-stretch align-items-md-end gap-1">
+        <a
+          *ngIf="selectedCompany?.trim()"
+          class="btn btn-primary btn-sm"
+          [routerLink]="['/saas-management', selectedCompany, 'ranches', 'new']"
+        >
+          {{ 'saas.createRanch' | t }}
+        </a>
+        <span class="small text-muted" *ngIf="!selectedCompany?.trim()">{{ 'ranches.pickCompanyToCreateRanch' | t }}</span>
       </div>
     </div>
   </div>
 
   <div class="app-card p-3">
+    <p class="text-muted small mb-2" *ngIf="isSaasOwner && !selectedCompany">
+      {{ 'ranches.showingAllCompanies' | t }}
+    </p>
     <p class="text-muted small mb-2" *ngIf="isSaasOwner && selectedCompanyName">
       {{ 'ranches.filteredByCompany' | t }}: <strong>{{ selectedCompanyName }}</strong>
     </p>
@@ -38,7 +52,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let ranch of ranches">
-            <td *ngIf="isSaasOwner">{{ selectedCompanyName }}</td>
+            <td *ngIf="isSaasOwner">{{ companyNameForRanch(ranch) }}</td>
             <td>{{ ranch.name }}</td>
             <td>{{ ranch.location || '-' }}</td>
             <td>{{ ranch.area || '-' }}</td>
@@ -46,7 +60,7 @@
               <a
                 class="btn btn-sm btn-outline-primary me-1"
                 [routerLink]="['/user-management']"
-                [queryParams]="isSaasOwner ? { company: selectedCompany, ranch: ranch.uuid_ranch } : { ranch: ranch.uuid_ranch }"
+                [queryParams]="isSaasOwner ? { company: selectedCompany || ranch.uuid_company, ranch: ranch.uuid_ranch } : { ranch: ranch.uuid_ranch }"
               >{{ 'saas.manageRanchUsers' | t }}</a>
               <a
                 class="btn btn-sm btn-outline-secondary"

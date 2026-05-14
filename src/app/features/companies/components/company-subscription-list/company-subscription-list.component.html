@@ -15,7 +15,7 @@
       <tr *ngFor="let sub of subscriptions">
         <td>{{ ('saas.planType.' + planTypeI18nSuffix(sub.plan_type)) | t }}</td>
         <td>{{ sub.amount }}</td>
-        <td>{{ sub.payment_method ? ('saas.paymentMethod.' + sub.payment_method) : '-' }}</td>
+        <td>{{ displayPaymentMethod(sub.payment_method) }}</td>
         <td>{{ sub.status }}</td>
         <td>{{ (sub.period_start || sub.paid_at) | date:'yyyy-MM-dd' }}</td>
         <td>{{ sub.period_end ? (sub.period_end | date:'yyyy-MM-dd') : '-' }}</td>

@@ -41,7 +41,6 @@ export class CompanyDetailComponent implements OnInit, OnDestroy {
   errorMessage = '';
 
   showRanchForm = false;
-  ranchFormMode: 'create' | 'edit' = 'create';
   ranchBeingEdited: RanchSummary | null = null;
   ranchForm: RanchFormValue = { name: '', location: '', area: '' };
   isSavingRanch = false;
@@ -235,49 +234,13 @@ export class CompanyDetailComponent implements OnInit, OnDestroy {
         role: value.role
       })
       .subscribe({
-        next: (user) => {
-          const finishSuccess = () => {
-            this.isSavingUser = false;
-            this.errorMessage = '';
-            this.cancelCreateUserForm();
-            if (this.company) {
-              this.loadCompanyUsers(this.company.uuid_company);
-            }
-          };
-
-          const finishMembershipError = () => {
-            this.isSavingUser = false;
-            this.errorMessage = this.i18nService.translate('errors.saveUserRole');
-          };
-
-          if (value.role === 'administrator') {
-            this.userManagementService.promoteCompanyAdministrator(user.uuid_user).subscribe({
-              next: () => finishSuccess(),
-              error: () => finishMembershipError()
-            });
-            return;
+        next: () => {
+          this.isSavingUser = false;
+          this.errorMessage = '';
+          this.cancelCreateUserForm();
+          if (this.company) {
+            this.loadCompanyUsers(this.company.uuid_company);
           }
-
-          if (value.role === 'ranch_staff') {
-            const ranchId =
-              this.ranches.find((r) => r.is_active !== false)?.uuid_ranch ?? this.ranches[0]?.uuid_ranch;
-            if (!ranchId) {
-              this.isSavingUser = false;
-              this.errorMessage = this.i18nService.translate('errors.noActiveRanchForStaff');
-              this.cancelCreateUserForm();
-              if (this.company) {
-                this.loadCompanyUsers(this.company.uuid_company);
-              }
-              return;
-            }
-            this.userManagementService.assignMembership(user.uuid_user, ranchId, value.role).subscribe({
-              next: () => finishSuccess(),
-              error: () => finishMembershipError()
-            });
-            return;
-          }
-
-          finishSuccess();
         },
         error: (err: unknown) => {
           this.errorMessage = translateUserWriteError(this.i18nService, err, 'errors.createUser');
@@ -291,23 +254,7 @@ export class CompanyDetailComponent implements OnInit, OnDestroy {
     this.showUserForm = false;
   }
 
-  toggleRanchForm(): void {
-    if (this.showRanchForm) {
-      this.cancelRanchForm();
-      return;
-    }
-    this.openCreateRanchForm();
-  }
-
-  openCreateRanchForm(): void {
-    this.ranchFormMode = 'create';
-    this.ranchBeingEdited = null;
-    this.ranchForm = { name: '', location: '', area: '' };
-    this.showRanchForm = true;
-  }
-
   openEditRanchForm(ranch: RanchSummary): void {
-    this.ranchFormMode = 'edit';
     this.ranchBeingEdited = ranch;
     this.ranchForm = {
       name: ranch.name ?? '',
@@ -324,38 +271,34 @@ export class CompanyDetailComponent implements OnInit, OnDestroy {
   }
 
   saveRanch(value: RanchFormValue): void {
-    if (!this.company) {
+    if (!this.company || !this.ranchBeingEdited) {
       return;
     }
     this.isSavingRanch = true;
     const payload = {
       name: value.name.trim(),
-      uuid_company: this.company.uuid_company,
       location: value.location.trim() || null,
       area: value.area.trim() || null
     };
 
-    const request$ =
-      this.ranchFormMode === 'edit' && this.ranchBeingEdited
-        ? this.saasManagementService.updateRanch(this.ranchBeingEdited.uuid_ranch, {
-            name: payload.name,
-            location: payload.location,
-            area: payload.area
-          })
-        : this.saasManagementService.createRanch(payload);
-
-    request$.subscribe({
-      next: () => {
-        this.isSavingRanch = false;
-        this.errorMessage = '';
-        this.cancelRanchForm();
-        this.loadRanches(this.company!.uuid_company);
-      },
-      error: () => {
-        this.isSavingRanch = false;
-        this.errorMessage = this.i18nService.translate('errors.saveRanch');
-      }
-    });
+    this.saasManagementService
+      .updateRanch(this.ranchBeingEdited.uuid_ranch, {
+        name: payload.name,
+        location: payload.location,
+        area: payload.area
+      })
+      .subscribe({
+        next: () => {
+          this.isSavingRanch = false;
+          this.errorMessage = '';
+          this.cancelRanchForm();
+          this.loadRanches(this.company!.uuid_company);
+        },
+        error: () => {
+          this.isSavingRanch = false;
+          this.errorMessage = this.i18nService.translate('errors.saveRanch');
+        }
+      });
   }
 
   openDeleteRanchModal(ranch: RanchSummary): void {
@@ -435,6 +378,7 @@ export class CompanyDetailComponent implements OnInit, OnDestroy {
   private loadSubscriptionHistory(uuidCompany: string): void {
     this.saasManagementService.getCompanyPayments(uuidCompany).subscribe({
       next: (subscriptions) => {
+        console.log('subscriptions', subscriptions);
         this.subscriptions = subscriptions;
         this.isLoading = false;
       },

@@ -9,6 +9,7 @@ import { Permission } from 'src/app/shared/constants/permissions';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CompanyActivationComponent } from './pages/company-activation/company-activation.component';
 import { CompanyDetailComponent } from './pages/company-detail/company-detail.component';
+import { CompanyRanchCreateComponent } from './pages/company-ranch-create/company-ranch-create.component';
 import { SaasManagementComponent } from './pages/saas-management/saas-management.component';
 import { CompanyRanchListComponent } from './components/company-ranch-list/company-ranch-list.component';
 import { CompanyUserListComponent } from './components/company-user-list/company-user-list.component';
@@ -34,6 +35,15 @@ const routes: Routes = [
     }
   },
   {
+    path: ':uuidCompany/ranches/new',
+    component: CompanyRanchCreateComponent,
+    canActivate: [AutenticacionGuard, PermissionGuard],
+    data: {
+      permissions: [Permission.RANCH_WRITE, Permission.COMPANY_TENANT_READ],
+      breadcrumb: 'breadcrumbs.createRanch'
+    }
+  },
+  {
     path: ':uuidCompany',
     component: CompanyDetailComponent,
     canActivate: [AutenticacionGuard, PermissionGuard],
@@ -48,6 +58,7 @@ const routes: Routes = [
   declarations: [
     SaasManagementComponent,
     CompanyDetailComponent,
+    CompanyRanchCreateComponent,
     CompanyActivationComponent,
     CompanyRanchListComponent,
     CompanyUserListComponent,

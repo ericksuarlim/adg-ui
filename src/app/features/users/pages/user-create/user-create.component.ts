@@ -20,7 +20,16 @@ export class UserCreateComponent implements OnInit {
   selectedRanch = '';
   errorMessage = '';
   formValue: UserFormValue = this.buildEmptyForm();
-  readonly assignableRoles: UserRole[] = ['administrator', 'ranch_staff'];
+
+  get assignableRoles(): UserRole[] {
+    if (this.isSaasOwner) {
+      return ['administrator', 'ranch_staff'];
+    }
+    if (this.sessionRoles.includes('administrator')) {
+      return ['ranch_staff'];
+    }
+    return ['ranch_staff'];
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -100,17 +109,6 @@ export class UserCreateComponent implements OnInit {
   }
 
   saveUser(value: UserFormValue): void {
-    if (value.role === 'administrator' && this.ranches.length === 0) {
-      this.errorMessage = this.i18nService.translate('errors.noActiveRanchForStaff');
-      return;
-    }
-    if (value.role === 'ranch_staff' && !this.selectedRanch?.trim()) {
-      this.errorMessage = this.i18nService.translate(
-        this.ranches.length === 0 ? 'errors.noActiveRanchForStaff' : 'errors.selectRanchForStaff'
-      );
-      return;
-    }
-
     const payload: UserManagementPayload = {
       id_card: value.id_card,
       first_name: value.first_name,
@@ -127,11 +125,9 @@ export class UserCreateComponent implements OnInit {
     }
 
     this.userManagementService.createUser(payload).subscribe({
-      next: (user) => {
+      next: () => {
         this.errorMessage = '';
-        this.syncRole(user.uuid_user, value.role, () => {
-          this.router.navigate(['/user-management'], { queryParams: this.backQueryParams });
-        });
+        this.router.navigate(['/user-management'], { queryParams: this.backQueryParams });
       },
       error: (err: unknown) => {
         this.errorMessage = translateUserWriteError(this.i18nService, err, 'errors.saveUser');
@@ -185,42 +181,5 @@ export class UserCreateComponent implements OnInit {
       role: 'ranch_staff',
       password: ''
     };
-  }
-
-  private syncRole(uuidUser: string, role: UserRole, onSuccess: () => void): void {
-    if (!this.canManageRanchRoles) {
-      onSuccess();
-      return;
-    }
-
-    if (role === 'administrator') {
-      this.userManagementService.promoteCompanyAdministrator(uuidUser).subscribe({
-        next: () => {
-          this.errorMessage = '';
-          onSuccess();
-        },
-        error: () => {
-          this.errorMessage = this.i18nService.translate('errors.saveUserRole');
-        }
-      });
-      return;
-    }
-
-    if (!this.selectedRanch?.trim()) {
-      this.errorMessage = this.i18nService.translate(
-        this.ranches.length === 0 ? 'errors.noActiveRanchForStaff' : 'errors.selectRanchForStaff'
-      );
-      return;
-    }
-
-    this.userManagementService.assignMembership(uuidUser, this.selectedRanch, role).subscribe({
-      next: () => {
-        this.errorMessage = '';
-        onSuccess();
-      },
-      error: () => {
-        this.errorMessage = this.i18nService.translate('errors.saveUserRole');
-      }
-    });
   }
 }

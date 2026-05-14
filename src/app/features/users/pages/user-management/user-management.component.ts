@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
 import { SessionService } from 'src/app/core/services/session.service';
 import { translateUserWriteError } from 'src/app/core/utils/user-write-error.util';
 import { normalizeUserRole, normalizeUserRoles, UserRole } from 'src/app/shared/constants/domain.constants';
@@ -26,7 +25,16 @@ export class UserManagementComponent implements OnInit {
   errorMessage = '';
   editUser: UserManagementItem | null = null;
   formValue: UserFormValue = this.buildEmptyForm();
-  readonly assignableRoles: UserRole[] = ['administrator', 'ranch_staff'];
+
+  get assignableRoles(): UserRole[] {
+    if (this.isSaasOwner) {
+      return ['administrator', 'ranch_staff'];
+    }
+    if (this.sessionRoles.includes('administrator')) {
+      return ['ranch_staff'];
+    }
+    return ['ranch_staff'];
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -52,13 +60,20 @@ export class UserManagementComponent implements OnInit {
     return this.sessionRoles.includes('saas_owner');
   }
 
-  /** Tenant admins may assign and change ranch roles (aligned with MEMBERSHIP_WRITE). */
+  /** Tenant admins may assign company roles (aligned with MEMBERSHIP_WRITE). */
   get canManageRanchRoles(): boolean {
     return this.isSaasOwner || this.sessionRoles.includes('administrator');
   }
 
   get selectedCompanyName(): string {
+    if (!this.selectedCompany?.trim()) {
+      return '';
+    }
     return this.companies.find((c) => c.uuid_company === this.selectedCompany)?.name ?? '';
+  }
+
+  companyNameForRanch(ranch: RanchOption): string {
+    return this.companies.find((c) => c.uuid_company === ranch.uuid_company)?.name ?? ranch.uuid_company;
   }
 
   get selectedRanchName(): string {
@@ -67,7 +82,10 @@ export class UserManagementComponent implements OnInit {
 
   get userFormTenantCompanyDisplay(): string {
     if (this.isSaasOwner) {
-      return this.selectedCompanyName || this.i18nService.translate('users.tenantCompanyPlaceholder');
+      if (this.selectedCompany?.trim()) {
+        return this.selectedCompanyName || this.i18nService.translate('users.tenantCompanyPlaceholder');
+      }
+      return this.i18nService.translate('users.allCompanies');
     }
     return this.i18nService.translate('users.tenantCompanyReadonly');
   }
@@ -77,9 +95,30 @@ export class UserManagementComponent implements OnInit {
       return false;
     }
     if (this.isSaasOwner) {
-      return this.companies.length > 0 && !!this.selectedCompany;
+      return this.companies.length > 0;
     }
     return Boolean(this.sessionService.getSession()?.uuid_company);
+  }
+
+  companyNameForUser(user: UserManagementItem): string {
+    return this.companies.find((c) => c.uuid_company === user.uuid_company)?.name ?? user.uuid_company;
+  }
+
+  ranchSelectLabel(ranch: RanchOption): string {
+    if (this.isSaasOwner && !this.selectedCompany?.trim()) {
+      return `${ranch.name} (${this.companyNameForRanch(ranch)})`;
+    }
+    return ranch.name;
+  }
+
+  get editFormCompanyNameHint(): string {
+    if (!this.isSaasOwner) {
+      return this.selectedCompanyName;
+    }
+    if (this.selectedCompany?.trim()) {
+      return this.selectedCompanyName;
+    }
+    return this.editUser ? this.companyNameForUser(this.editUser) : '';
   }
 
   get createQueryParams(): Record<string, string> {
@@ -95,7 +134,11 @@ export class UserManagementComponent implements OnInit {
 
   get availabilityCompanyId(): string | null {
     if (this.isSaasOwner) {
-      return this.selectedCompany || null;
+      const fromSelect = this.selectedCompany?.trim();
+      if (fromSelect) {
+        return fromSelect;
+      }
+      return this.editUser?.uuid_company ?? null;
     }
     return this.sessionService.getSession()?.uuid_company ?? null;
   }
@@ -135,21 +178,22 @@ export class UserManagementComponent implements OnInit {
       role: value.role
     };
 
-    if (this.isSaasOwner && this.selectedCompany) {
-      payload.uuid_company = this.selectedCompany;
+    if (this.isSaasOwner) {
+      const companyUuid = this.selectedCompany.trim() || this.editUser.uuid_company;
+      if (companyUuid) {
+        payload.uuid_company = companyUuid;
+      }
     }
     if (this.isSaasOwner && value.password?.trim()) {
       payload.password = value.password;
     }
 
     this.userManagementService.updateUser(this.editUser.uuid_user, payload).subscribe({
-      next: (user) => {
+      next: () => {
         this.errorMessage = '';
-        this.syncRole(user.uuid_user, value.role, () => {
-          this.editUser = null;
-          this.formValue = this.buildEmptyForm();
-          this.loadUsers();
-        }, false);
+        this.editUser = null;
+        this.formValue = this.buildEmptyForm();
+        this.loadUsers();
       },
       error: (err: unknown) => {
         this.errorMessage = translateUserWriteError(this.i18nService, err, 'errors.saveUser');
@@ -187,7 +231,7 @@ export class UserManagementComponent implements OnInit {
         this.companies = companies;
         const want = this.route.snapshot.queryParamMap.get('company') ?? '';
         this.selectedCompany =
-          want && companies.some((c) => c.uuid_company === want) ? want : companies[0]?.uuid_company ?? '';
+          want && companies.some((c) => c.uuid_company === want) ? want : '';
         this.loadRanchAndUsers();
       },
       error: () => {
@@ -198,33 +242,10 @@ export class UserManagementComponent implements OnInit {
 
   private loadUsers(): void {
     this.isLoading = true;
-    this.userManagementService.getUsers(this.isSaasOwner ? this.selectedCompany : undefined).subscribe({
+    this.userManagementService.getUsers(this.isSaasOwner ? (this.selectedCompany.trim() || undefined) : undefined).subscribe({
       next: (users) => {
-        if (!this.selectedRanch) {
-          this.users = users;
-          this.isLoading = false;
-          return;
-        }
-
-        this.userManagementService.getMembershipsByRanch(this.selectedRanch).subscribe({
-          next: (memberships) => {
-            const roleMap = new Map<string, UserRole>(
-              memberships.filter((m) => m.is_active !== false).map((m) => [m.uuid_user, m.role])
-            );
-            this.users = users
-              .filter((user) => roleMap.has(user.uuid_user))
-              .map((user) => ({
-                ...user,
-                role: roleMap.get(user.uuid_user) as UserRole
-              }));
-            this.isLoading = false;
-          },
-          error: () => {
-            this.users = [];
-            this.errorMessage = this.i18nService.translate('errors.loadUsers');
-            this.isLoading = false;
-          }
-        });
+        this.users = users;
+        this.isLoading = false;
       },
       error: () => {
         this.users = [];
@@ -249,7 +270,8 @@ export class UserManagementComponent implements OnInit {
   }
 
   private loadRanchAndUsers(): void {
-    this.userManagementService.getRanches(this.isSaasOwner ? this.selectedCompany : undefined).subscribe({
+    const companyFilter = this.isSaasOwner ? (this.selectedCompany.trim() || undefined) : undefined;
+    this.userManagementService.getRanches(companyFilter).subscribe({
       next: (ranches) => {
         this.ranches = ranches;
         const wantRanch = this.route.snapshot.queryParamMap.get('ranch') ?? '';
@@ -261,55 +283,6 @@ export class UserManagementComponent implements OnInit {
         this.ranches = [];
         this.selectedRanch = '';
         this.loadUsers();
-      }
-    });
-  }
-
-  private syncRole(uuidUser: string, role: UserRole, onSuccess: () => void, isCreate: boolean): void {
-    if (!this.canManageRanchRoles) {
-      onSuccess();
-      return;
-    }
-
-    if (role === 'administrator') {
-      this.userManagementService.promoteCompanyAdministrator(uuidUser).subscribe({
-        next: () => {
-          this.errorMessage = '';
-          onSuccess();
-        },
-        error: () => {
-          this.errorMessage = this.i18nService.translate('errors.saveUserRole');
-        }
-      });
-      return;
-    }
-
-    if (!this.selectedRanch?.trim()) {
-      this.errorMessage = this.i18nService.translate(
-        this.ranches.length === 0 ? 'errors.noActiveRanchForStaff' : 'errors.selectRanchForStaff'
-      );
-      return;
-    }
-
-    const assign$ = this.userManagementService.assignMembership(uuidUser, this.selectedRanch, role);
-    const request$ = isCreate
-      ? assign$
-      : this.userManagementService.updateMembershipRole(uuidUser, this.selectedRanch, role).pipe(
-          catchError((err: { status?: number }) => {
-            if (err?.status === 404) {
-              return assign$;
-            }
-            return throwError(() => err);
-          })
-        );
-
-    request$.subscribe({
-      next: () => {
-        this.errorMessage = '';
-        onSuccess();
-      },
-      error: () => {
-        this.errorMessage = this.i18nService.translate('errors.saveUserRole');
       }
     });
   }

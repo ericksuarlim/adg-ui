@@ -89,15 +89,14 @@ export class UserManagementService {
     return this.http.post(`${this.membershipUrl}/company-administrator`, { uuid_user: uuidUser });
   }
 
-  assignMembership(uuidUser: string, uuidRanch: string, role: string): Observable<unknown> {
+  assignMembership(uuidUser: string, _uuidRanch: string | undefined, role: string): Observable<unknown> {
     return this.http.post(this.membershipUrl, {
       uuid_user: uuidUser,
-      uuid_ranch: uuidRanch,
       role
     });
   }
 
-  updateMembershipRole(uuidUser: string, uuidRanch: string, role: string): Observable<unknown> {
-    return this.http.put(`${this.membershipUrl}/${uuidUser}/${uuidRanch}`, { role });
+  updateMembershipRole(uuidUser: string, _uuidRanch: string | undefined, role: string): Observable<unknown> {
+    return this.http.put(`${this.membershipUrl}/${uuidUser}`, { role });
   }
 }
