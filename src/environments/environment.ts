@@ -12,6 +12,10 @@ export const environment = {
     messagingSenderId: "600192451808",
     appId: "1:600192451808:web:e45db6262c59047047fc85"
   },
+  /**
+   * URL base del backend (incluye `/api` porque Express monta las rutas ahí).
+   * Puerto por defecto: 3010 (publicado por `adg-api/docker-compose.yml` como `ADG_API_PORT`).
+   */
   urlApi: "http://localhost:3010/api"
 
 };

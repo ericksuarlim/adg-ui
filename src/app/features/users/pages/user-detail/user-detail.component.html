@@ -5,7 +5,9 @@
 
   <p class="text-danger mt-2" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-  <div class="app-card p-3 mt-3" *ngIf="user">
+  <div class="text-muted py-4" *ngIf="isLoading">{{ 'common.loading' | t }}</div>
+
+  <div class="app-card p-3 mt-3" *ngIf="user && !isLoading">
     <div class="row g-3">
       <div class="col-md-4">
         <div class="form-label mb-1">{{ 'common.username' | t }}</div>
@@ -17,7 +19,13 @@
       </div>
       <div class="col-md-4">
         <div class="form-label mb-1">{{ 'userForm.role' | t }}</div>
-        <div class="app-detail-value">{{ ('roles.' + (user.role || 'user')) | t }}</div>
+        <div class="app-detail-value">
+          <ng-container *ngIf="summaryRole as sr">{{ ('roles.' + sr) | t }}</ng-container>
+          <ng-container *ngIf="!summaryRole && normalizeUserRole(user.role ?? '') as ur">{{ ('roles.' + ur) | t }}</ng-container>
+          <ng-container *ngIf="!summaryRole && user.role && !normalizeUserRole(user.role)">{{ 'users.unrecognizedRole' | t }}</ng-container>
+          <ng-container *ngIf="!summaryRole && !user.role">{{ 'users.detailRoleUnknown' | t }}</ng-container>
+        </div>
+        <p class="form-text small text-muted mb-0 mt-1" *ngIf="summaryRole">{{ 'users.detailRoleSummaryHint' | t }}</p>
       </div>
       <div class="col-md-4">
         <div class="form-label mb-1">{{ 'userForm.idCard' | t }}</div>
@@ -40,6 +48,41 @@
         <div class="app-detail-value">{{ user.is_active ? ('users.active' | t) : ('users.inactive' | t) }}</div>
       </div>
     </div>
+  </div>
+
+  <div class="app-card p-3 mt-3 user-detail__ranches" *ngIf="user && !isLoading">
+    <h5 class="mb-2">{{ 'users.detailRanchesTitle' | t }}</h5>
+    <div class="table-responsive app-table" *ngIf="ranchRows.length > 0">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{{ 'users.ranch' | t }}</th>
+            <th>{{ 'userForm.role' | t }}</th>
+            <th>{{ 'common.detail' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of ranchRows">
+            <td>{{ row.ranchName }}</td>
+            <td>
+              <ng-container *ngIf="row.role as rr">{{ ('roles.' + rr) | t }}</ng-container>
+              <span *ngIf="!row.role" class="text-muted">{{ 'users.unrecognizedRole' | t }}</span>
+            </td>
+            <td>
+              <a
+                *ngIf="canOpenRanchDetail"
+                class="btn btn-sm btn-outline-secondary"
+                [routerLink]="['/ranch-management', row.uuid_ranch]"
+              >
+                {{ 'ranches.viewRanchDetail' | t }}
+              </a>
+              <span *ngIf="!canOpenRanchDetail" class="text-muted small">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-muted mb-0" *ngIf="ranchRows.length === 0">{{ 'users.detailNoRanchMembership' | t }}</p>
   </div>
 
   <div class="app-card p-3 mt-3 text-muted" *ngIf="!isLoading && !user && !errorMessage">

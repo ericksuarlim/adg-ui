@@ -1,0 +1,57 @@
+.animal-batch-toolbar .animal-batch-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary, #6c757d);
+}
+
+.animal-batch-excel-hint {
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.animal-batch-table-card {
+  overflow: hidden;
+}
+
+.animal-batch-scroll {
+  max-height: min(70vh, 42rem);
+  overflow: auto;
+}
+
+.animal-batch-table {
+  font-size: 0.72rem;
+}
+
+.animal-batch-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: 0 1px 0 var(--bs-border-color, #dee2e6);
+  padding: 0.2rem 0.35rem;
+  white-space: nowrap;
+}
+
+.animal-batch-table td {
+  padding: 0.15rem 0.3rem;
+  vertical-align: middle;
+}
+
+.animal-batch-col-idx {
+  width: 2rem;
+  font-size: 0.68rem;
+}
+
+.animal-batch-control {
+  font-size: 0.72rem !important;
+  line-height: 1.2 !important;
+  min-height: 1.45rem !important;
+  padding: 0.1rem 0.35rem !important;
+}
+
+.animal-batch-table .form-select.animal-batch-control {
+  padding-top: 0.05rem !important;
+  padding-bottom: 0.05rem !important;
+}

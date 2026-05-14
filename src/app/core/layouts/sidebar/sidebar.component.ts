@@ -18,12 +18,29 @@ export class SidebarComponent {
     return this.hasPermission(Permission.COMPANY_READ);
   }
 
+  get canAccessTenantCompany(): boolean {
+    return (
+      this.hasPermission(Permission.COMPANY_TENANT_READ) &&
+      !this.hasPermission(Permission.COMPANY_READ) &&
+      Boolean(this.sessionService.getUuidCompany())
+    );
+  }
+
+  get tenantCompanyRouterLink(): string | null {
+    const id = this.sessionService.getUuidCompany();
+    return id ? `/saas-management/${id}` : null;
+  }
+
   get canAccessUsers(): boolean {
     return this.hasPermission(Permission.USER_READ);
   }
 
+  get canAccessRanches(): boolean {
+    return this.hasPermission(Permission.RANCH_READ);
+  }
+
   get hasAdministrationSection(): boolean {
-    return this.canAccessCompanies || this.canAccessUsers;
+    return this.canAccessCompanies || this.canAccessUsers || this.canAccessTenantCompany || this.canAccessRanches;
   }
 
   private hasPermission(permission: Permission): boolean {

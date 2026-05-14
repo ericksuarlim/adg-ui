@@ -63,12 +63,17 @@
   font-size: .82rem;
 }
 
-.login__links a {
+.login__links .login__link {
   color: var(--text-secondary);
   text-decoration: none;
   font-size: .78rem;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
 }
 
-.login__links a:hover {
+.login__links .login__link:hover,
+.login__links .login__link:focus {
   color: var(--primary);
+  text-decoration: none;
 }

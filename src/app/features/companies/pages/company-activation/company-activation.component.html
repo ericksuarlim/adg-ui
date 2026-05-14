@@ -24,13 +24,10 @@
     </div>
 
     <div class="row g-2 mt-2">
-      <div class="col-md-6">
-        <label class="form-label mb-1" for="estimated-monthly-amount">{{ 'saas.estimatedMonthlyAmount' | t }}</label>
-        <input id="estimated-monthly-amount" class="form-control company-activation__readonly" type="text" [value]="'BOB ' + (estimatedMonthlyAmountBs | number:'1.2-2')" readonly />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label mb-1" for="estimated-annual-amount">{{ 'saas.estimatedAnnualAmount' | t }}</label>
-        <input id="estimated-annual-amount" class="form-control company-activation__readonly" type="text" [value]="'BOB ' + (estimatedAnnualAmountBs | number:'1.2-2')" readonly />
+      <div class="col-md-12">
+        <label class="form-label mb-1" for="estimated-period-charge">{{ 'saas.estimatedPeriodCharge' | t }}</label>
+        <input id="estimated-period-charge" class="form-control company-activation__readonly" type="text" [value]="'USD ' + (estimatedPeriodChargeUsd | number:'1.2-2')" readonly />
+        <div class="form-text text-muted">{{ planHeadLimitHint }}</div>
       </div>
     </div>
 

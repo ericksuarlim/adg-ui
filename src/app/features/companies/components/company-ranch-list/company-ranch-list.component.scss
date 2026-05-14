@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+.company-ranch-row--highlight {
+  box-shadow: inset 3px 0 0 0 var(--bs-primary, #0d6efd);
+  background-color: rgba(13, 110, 253, 0.06);
+}

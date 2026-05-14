@@ -23,6 +23,8 @@ export interface UserManagementPayload {
   id_card: string;
   first_name: string;
   last_name: string;
+  second_last_name?: string | null;
+  phone?: string | null;
   email: string;
   username: string;
   role?: UserRole;
@@ -38,6 +40,8 @@ export interface RanchOption {
   uuid_ranch: string;
   uuid_company: string;
   name: string;
+  location?: string | null;
+  area?: string | null;
 }
 
 export interface MembershipItem {

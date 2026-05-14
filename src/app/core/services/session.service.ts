@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { JwtPayload, SessionData } from '../../shared/models/auth.model';
-import { UserRole } from '../../shared/constants/domain.constants';
+import { normalizeUserRoles, UserRole } from '../../shared/constants/domain.constants';
+import { decodeJwtPayload } from '../utils/decode-jwt-payload';
 
 const SESSION_KEY = 'adg_session';
 
@@ -26,6 +27,10 @@ export class SessionService {
 
   getRoles(): UserRole[] {
     return this.sessionSubject.value?.roles ?? [];
+  }
+
+  getUuidCompany(): string | null {
+    return this.sessionSubject.value?.uuid_company ?? null;
   }
 
   isAuthenticated(): boolean {
@@ -59,12 +64,7 @@ export class SessionService {
       return null;
     }
 
-    try {
-      const [, payload] = token.split('.');
-      return JSON.parse(atob(payload)) as JwtPayload;
-    } catch {
-      return null;
-    }
+    return decodeJwtPayload<JwtPayload>(token);
   }
 
   private readSession(): SessionData | null {
@@ -74,7 +74,15 @@ export class SessionService {
     }
 
     try {
-      return JSON.parse(rawSession) as SessionData;
+      const session = JSON.parse(rawSession) as SessionData;
+      if (session?.token && (!session.roles || session.roles.length === 0)) {
+        const payload = decodeJwtPayload<JwtPayload & { roles?: string[] }>(session.token);
+        if (payload?.roles?.length) {
+          session.roles = normalizeUserRoles(payload.roles);
+          localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+      }
+      return session;
     } catch {
       return null;
     }

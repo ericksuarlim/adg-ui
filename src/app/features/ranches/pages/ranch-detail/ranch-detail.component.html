@@ -1,0 +1,117 @@
+<div class="ranch-detail">
+  <p class="text-danger mb-0" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="ranch-detail__loading text-center py-5" *ngIf="isLoading && !ranch">
+    <div class="ranch-detail__loading-icon mb-2">
+      <i class="bi bi-hourglass-split"></i>
+    </div>
+    <span class="text-muted">{{ 'common.loading' | t }}</span>
+  </div>
+
+  <ng-container *ngIf="ranch && !errorMessage">
+    <header class="ranch-detail__hero">
+      <div class="ranch-detail__hero-top">
+        <a class="btn btn-outline-secondary btn-sm ranch-detail__back" routerLink="/ranch-management">
+          <i class="bi bi-arrow-left me-1"></i>{{ 'ranches.backToList' | t }}
+        </a>
+        <span
+          class="ranch-detail__status"
+          [class.ranch-detail__status--active]="ranch.is_active !== false"
+          [class.ranch-detail__status--inactive]="ranch.is_active === false"
+        >
+          <i class="bi me-1" [ngClass]="ranch.is_active === false ? 'bi-pause-circle' : 'bi-check-circle-fill'"></i>
+          {{ ranch.is_active === false ? ('users.inactive' | t) : ('users.active' | t) }}
+        </span>
+      </div>
+      <div class="ranch-detail__hero-main">
+        <div class="ranch-detail__hero-icon" aria-hidden="true">
+          <i class="bi bi-pin-map"></i>
+        </div>
+        <div class="ranch-detail__hero-text">
+          <h1 class="ranch-detail__title">{{ ranch.name }}</h1>
+          <p class="ranch-detail__company-line mb-0" *ngIf="isSaasOwner && companyName">
+            <i class="bi bi-building me-1"></i>{{ companyName }}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section class="app-card ranch-detail__card ranch-detail__card--meta">
+      <div class="ranch-detail__card-head">
+        <i class="bi bi-info-circle ranch-detail__card-head-icon" aria-hidden="true"></i>
+        <h2 class="ranch-detail__card-title">{{ 'common.detail' | t }}</h2>
+      </div>
+      <div class="ranch-detail__card-body">
+        <div class="ranch-detail__stats">
+          <div class="ranch-detail__stat" *ngIf="isSaasOwner && companyName">
+            <span class="ranch-detail__stat-icon"><i class="bi bi-buildings"></i></span>
+            <span class="ranch-detail__stat-label">{{ 'users.company' | t }}</span>
+            <span class="ranch-detail__stat-value">{{ companyName }}</span>
+          </div>
+          <div class="ranch-detail__stat">
+            <span class="ranch-detail__stat-icon"><i class="bi bi-geo-alt"></i></span>
+            <span class="ranch-detail__stat-label">{{ 'saas.ranchLocation' | t }}</span>
+            <span class="ranch-detail__stat-value">{{ ranch.location || '—' }}</span>
+          </div>
+          <div class="ranch-detail__stat">
+            <span class="ranch-detail__stat-icon"><i class="bi bi-grid-3x3-gap"></i></span>
+            <span class="ranch-detail__stat-label">{{ 'saas.ranchArea' | t }} (ha)</span>
+            <span class="ranch-detail__stat-value">{{ ranch.area || '—' }}</span>
+          </div>
+        </div>
+        <div class="ranch-detail__actions">
+          <a
+            class="btn btn-primary btn-sm"
+            [routerLink]="['/user-management']"
+            [queryParams]="userManagementQueryParams()"
+          >
+            <i class="bi bi-people me-1"></i>{{ 'saas.manageRanchUsers' | t }}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-card ranch-detail__card ranch-detail__card--members">
+      <div class="ranch-detail__card-head">
+        <i class="bi bi-people-fill ranch-detail__card-head-icon" aria-hidden="true"></i>
+        <h2 class="ranch-detail__card-title">{{ 'ranches.usersOnRanch' | t }}</h2>
+        <span class="ranch-detail__count badge rounded-pill" *ngIf="!isLoading">{{ members.length }}</span>
+      </div>
+      <div class="ranch-detail__card-body">
+        <div class="alert alert-light border ranch-detail__hint mb-3" *ngIf="!canReadUsers">
+          <i class="bi bi-shield-lock me-2"></i>{{ 'ranches.membershipOnlyHint' | t }}
+        </div>
+        <div class="table-responsive app-table" *ngIf="members.length > 0 || isLoading">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>{{ 'common.username' | t }}</th>
+                <th>{{ 'common.email' | t }}</th>
+                <th>{{ 'userForm.firstName' | t }}</th>
+                <th>{{ 'userForm.lastName' | t }}</th>
+                <th>{{ 'userForm.role' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of members">
+                <td>
+                  <span class="ranch-detail__username">{{ row.username || row.uuid_user }}</span>
+                </td>
+                <td>{{ row.email || '—' }}</td>
+                <td>{{ row.first_name || '—' }}</td>
+                <td>{{ row.last_name || '—' }}</td>
+                <td>
+                  <span class="ranch-detail__role-pill">{{ ('roles.' + row.role) | t }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ranch-detail__empty text-center py-4 text-muted" *ngIf="!isLoading && members.length === 0">
+          <i class="bi bi-inbox ranch-detail__empty-icon d-block mb-2"></i>
+          {{ 'ranches.noMembers' | t }}
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</div>

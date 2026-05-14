@@ -1,0 +1,46 @@
+<div class="table-responsive app-table">
+  <table class="table table-striped table-hover mb-0">
+    <thead>
+      <tr>
+        <th>{{ 'saas.ranchName' | t }}</th>
+        <th>{{ 'saas.ranchLocation' | t }}</th>
+        <th>{{ 'saas.ranchArea' | t }} ha</th>
+        <th>{{ 'common.status' | t }}</th>
+        <th>{{ 'common.actions' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let ranch of ranches"
+        [id]="'ranch-row-' + ranch.uuid_ranch"
+        [class.company-ranch-row--highlight]="highlightedRanchUuid === ranch.uuid_ranch"
+      >
+        <td>{{ ranch.name }}</td>
+        <td>{{ ranch.location || '-' }}</td>
+        <td>{{ ranch.area || '-' }}</td>
+        <td>{{ ranch.is_active === false ? ('users.inactive' | t) : ('users.active' | t) }}</td>
+        <td>
+          <a
+            *ngIf="canManageRanchUsers"
+            class="btn btn-sm btn-outline-primary me-1"
+            [routerLink]="['/user-management']"
+            [queryParams]="{ company: companyUuid, ranch: ranch.uuid_ranch }"
+          >{{ 'saas.manageRanchUsers' | t }}</a>
+          <button
+            *ngIf="canManageRanches && ranch.is_active !== false"
+            type="button"
+            class="btn btn-sm btn-outline-secondary me-1"
+            (click)="onEdit(ranch)"
+          >{{ 'users.edit' | t }}</button>
+          <button
+            *ngIf="canManageRanches && ranch.is_active !== false"
+            type="button"
+            class="btn btn-sm btn-outline-danger"
+            (click)="onArchive(ranch)"
+          >{{ 'saas.archiveRanch' | t }}</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="text-muted mt-2" *ngIf="ranches.length === 0">{{ 'saas.ranchesEmpty' | t }}</div>

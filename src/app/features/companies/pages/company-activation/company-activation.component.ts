@@ -8,7 +8,12 @@ import {
   PAYMENT_METHODS,
   PaymentMethod
 } from 'src/app/shared/constants/domain.constants';
-import { ANNUAL_DISCOUNT_PERCENT, PLAN_PRICES_BS } from 'src/app/shared/constants/subscription.constants';
+import {
+  getSubscriptionChargeUsd,
+  normalizeBillingCycle,
+  normalizeCompanyPlanType,
+  PLAN_HEAD_LIMIT
+} from 'src/app/shared/constants/subscription.constants';
 import { I18nService } from 'src/app/core/services/i18n.service';
 import { CompanyManagement, CompanyPaidActivationPayload, CompanyPayment } from '../../models/company-management.model';
 import { SaasManagementService } from '../../services/saas-management.service';
@@ -34,9 +39,9 @@ export class CompanyActivationComponent implements OnInit {
     notes: '',
     paid_at: new Date().toISOString().slice(0, 10),
     period_start: new Date().toISOString().slice(0, 10),
-    plan_type: 'BASIC',
-    billing_cycle: 'MONTHLY',
-    amount: PLAN_PRICES_BS.BASIC
+    plan_type: 'ESSENTIAL',
+    billing_cycle: 'ANNUAL',
+    amount: getSubscriptionChargeUsd('ESSENTIAL', 'ANNUAL')
   };
 
   trialForm = {
@@ -59,20 +64,14 @@ export class CompanyActivationComponent implements OnInit {
     this.loadCompany(uuidCompany);
   }
 
-  get calculatedAmountBs(): number {
-    const monthlyPrice = PLAN_PRICES_BS[this.paymentForm.plan_type];
-    if (this.paymentForm.billing_cycle === 'ANNUAL') {
-      return Number((monthlyPrice * 12 * (1 - ANNUAL_DISCOUNT_PERCENT / 100)).toFixed(2));
-    }
-    return monthlyPrice;
+  get estimatedPeriodChargeUsd(): number {
+    return getSubscriptionChargeUsd(this.paymentForm.plan_type, this.paymentForm.billing_cycle);
   }
 
-  get estimatedMonthlyAmountBs(): number {
-    return PLAN_PRICES_BS[this.paymentForm.plan_type];
-  }
-
-  get estimatedAnnualAmountBs(): number {
-    return Number((this.estimatedMonthlyAmountBs * 12 * (1 - ANNUAL_DISCOUNT_PERCENT / 100)).toFixed(2));
+  get planHeadLimitHint(): string {
+    const plan = normalizeCompanyPlanType(this.paymentForm.plan_type);
+    const limit = PLAN_HEAD_LIMIT[plan];
+    return this.i18nService.translate('saas.planHeadLimitHint', { limit });
   }
 
   get hasActivePaidSubscription(): boolean {
@@ -109,8 +108,8 @@ export class CompanyActivationComponent implements OnInit {
       next: () => {
         if (this.company) {
           this.company.membership_status = 'ACTIVE';
-          this.company.plan_type = this.paymentForm.plan_type;
-          this.company.billing_cycle = this.paymentForm.billing_cycle;
+          this.company.plan_type = normalizeCompanyPlanType(this.paymentForm.plan_type);
+          this.company.billing_cycle = normalizeBillingCycle(this.paymentForm.billing_cycle);
           this.loadPayments(this.company.uuid_company);
         }
       },
@@ -121,7 +120,7 @@ export class CompanyActivationComponent implements OnInit {
   }
 
   onPlanOrCycleChanged(): void {
-    this.paymentForm.amount = this.calculatedAmountBs;
+    this.paymentForm.amount = this.estimatedPeriodChargeUsd;
   }
 
   activateTrial(): void {
@@ -139,18 +138,20 @@ export class CompanyActivationComponent implements OnInit {
     });
   }
 
-  getPlanLabel(plan: CompanyPlanType | undefined): string {
+  getPlanLabel(plan: CompanyPlanType | string | undefined): string {
     if (!plan) {
       return '-';
     }
-    return this.i18nService.translate(`saas.planType.${plan.toLowerCase()}`);
+    const key = normalizeCompanyPlanType(String(plan)).toLowerCase();
+    return this.i18nService.translate(`saas.planType.${key}`);
   }
 
-  getBillingCycleLabel(cycle: BillingCycle | undefined): string {
+  getBillingCycleLabel(cycle: BillingCycle | string | undefined): string {
     if (!cycle) {
       return '-';
     }
-    return this.i18nService.translate(`saas.billingCycle.${cycle.toLowerCase()}`);
+    const key = normalizeBillingCycle(String(cycle)).toLowerCase();
+    return this.i18nService.translate(`saas.billingCycle.${key}`);
   }
 
   getPaymentMethodLabel(method: PaymentMethod): string {
@@ -158,10 +159,12 @@ export class CompanyActivationComponent implements OnInit {
   }
 
   private getActivationPaymentValidationErrorKey(): string | null {
-    if (!this.paymentForm.plan_type || !this.planTypes.includes(this.paymentForm.plan_type)) {
+    const plan = normalizeCompanyPlanType(this.paymentForm.plan_type);
+    if (!this.paymentForm.plan_type || !this.planTypes.includes(plan)) {
       return 'saas.validation.activationPlanRequired';
     }
-    if (!this.paymentForm.billing_cycle || !this.billingCycles.includes(this.paymentForm.billing_cycle)) {
+    const cycle = normalizeBillingCycle(this.paymentForm.billing_cycle);
+    if (!this.paymentForm.billing_cycle || !this.billingCycles.includes(cycle)) {
       return 'saas.validation.activationCycleRequired';
     }
     if (!this.paymentForm.payment_method || !this.paymentMethods.includes(this.paymentForm.payment_method)) {
@@ -185,8 +188,12 @@ export class CompanyActivationComponent implements OnInit {
   private buildActivationPaymentPayload(): CompanyPaidActivationPayload {
     const reference = (this.paymentForm.payment_reference ?? '').toString().trim();
     const notes = (this.paymentForm.notes ?? '').toString().trim();
+    const plan = normalizeCompanyPlanType(this.paymentForm.plan_type);
+    const cycle = normalizeBillingCycle(this.paymentForm.billing_cycle);
     return {
       ...this.paymentForm,
+      plan_type: plan,
+      billing_cycle: cycle,
       amount: Number(this.paymentForm.amount),
       payment_reference: reference.length > 0 ? reference : null,
       notes: notes.length > 0 ? notes : null
@@ -203,9 +210,9 @@ export class CompanyActivationComponent implements OnInit {
           this.isLoading = false;
           return;
         }
-        this.paymentForm.plan_type = this.company.plan_type;
-        this.paymentForm.billing_cycle = this.company.billing_cycle;
-        this.paymentForm.amount = this.calculatedAmountBs;
+        this.paymentForm.plan_type = normalizeCompanyPlanType(this.company.plan_type);
+        this.paymentForm.billing_cycle = normalizeBillingCycle(this.company.billing_cycle);
+        this.paymentForm.amount = this.estimatedPeriodChargeUsd;
         this.loadPayments(uuidCompany);
       },
       error: () => {

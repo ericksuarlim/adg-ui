@@ -27,6 +27,12 @@ const routes: Routes = [
     data: { breadcrumb: 'breadcrumbs.saasManagement' }
   },
   {
+    path: 'ranch-management',
+    loadChildren: () =>
+      import('./features/ranches/ranch-management.module').then((m) => m.RanchManagementModule),
+    data: { breadcrumb: 'breadcrumbs.ranchManagement' }
+  },
+  {
     path: 'user-management',
     loadChildren: () =>
       import('./features/users/user-management.module').then((m) => m.UserManagementModule),

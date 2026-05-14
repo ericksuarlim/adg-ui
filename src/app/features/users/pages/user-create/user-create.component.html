@@ -1,0 +1,65 @@
+<div class="container-fluid user-create">
+  <div class="app-page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <h3 class="app-page-title mb-0">{{ 'users.create' | t }}</h3>
+    <a class="btn btn-outline-secondary btn-sm" [routerLink]="['/user-management']" [queryParams]="backQueryParams">
+      {{ 'users.backToList' | t }}
+    </a>
+  </div>
+
+  <p class="text-danger mt-2" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="app-card p-3 mb-3" *ngIf="isSaasOwner || ranches.length > 0">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4" *ngIf="isSaasOwner">
+        <label class="form-label mb-1" for="create-users-company">{{ 'users.company' | t }}</label>
+        <select
+          id="create-users-company"
+          class="form-select"
+          [value]="selectedCompany"
+          (change)="onCompanyChange($any($event.target).value)"
+        >
+          <option *ngFor="let company of companies" [value]="company.uuid_company">{{ company.name }}</option>
+        </select>
+      </div>
+      <div class="col-md-4" *ngIf="ranches.length > 0 && formValue.role !== 'administrator'">
+        <label class="form-label mb-1" for="create-users-ranch">{{ 'users.ranch' | t }}</label>
+        <select
+          id="create-users-ranch"
+          class="form-select"
+          [value]="selectedRanch"
+          (change)="onRanchChange($any($event.target).value)"
+        >
+          <option *ngFor="let ranch of ranches" [value]="ranch.uuid_ranch">{{ ranch.name }}</option>
+        </select>
+      </div>
+    </div>
+    <p class="form-text small text-muted mb-0 mt-2" *ngIf="canManageRanchRoles">{{ 'users.membershipRulesSummary' | t }}</p>
+  </div>
+
+  <div class="app-card p-3 mb-3">
+    <app-user-form
+      mode="create"
+      [showPassword]="true"
+      [value]="formValue"
+      [companyNameHint]="selectedCompanyName"
+      [availabilityUuidCompany]="availabilityCompanyId"
+      [availableRoles]="assignableRoles"
+      [roleDisabled]="!canManageRanchRoles"
+      [showTenantContext]="userFormTenantContextVisible"
+      [tenantCompanyName]="userFormTenantCompanyDisplay"
+      [tenantRanchName]="selectedRanchName"
+      [canChangeTenantCompany]="isSaasOwner"
+      [canChangeTenantRanch]="canManageRanchRoles && ranches.length > 0"
+      [tenantCompanies]="companies"
+      [tenantRanches]="ranches"
+      [selectedTenantCompanyUuid]="selectedCompany"
+      [selectedTenantRanchUuid]="selectedRanch"
+      [submitLabelKey]="'users.create'"
+      [cancelLabelKey]="'common.cancel'"
+      (tenantCompanyChange)="onCompanyChange($event)"
+      (tenantRanchChange)="onRanchChange($event)"
+      (submitForm)="saveUser($event)"
+      (cancelForm)="goBack()"
+    ></app-user-form>
+  </div>
+</div>

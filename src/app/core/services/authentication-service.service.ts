@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { LoginRequest, LoginResponse, SessionData } from '../../shared/models/auth.model';
 import { normalizeUserRoles, UserRole } from '../../shared/constants/domain.constants';
 import { SessionService } from './session.service';
+import { decodeJwtPayload } from '../utils/decode-jwt-payload';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class AuthenticationServiceService {
   }
 
   login(userData: LoginRequest): Observable<LoginResponse> {
+    console.log('userData', userData);
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, userData).pipe(
       tap((response) => {
         if (response.success && response.data) {
@@ -71,11 +73,6 @@ export class AuthenticationServiceService {
   private decodeToken(
     token: string
   ): { roles?: UserRole[]; membership_status?: SessionData['membership_status']; membership_renewal_at?: string | null } | null {
-    try {
-      const [, payload] = token.split('.');
-      return JSON.parse(atob(payload)) as { roles?: UserRole[] };
-    } catch {
-      return null;
-    }
+    return decodeJwtPayload(token);
   }
 }

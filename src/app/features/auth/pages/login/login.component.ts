@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -25,7 +26,7 @@ export class LoginComponent {
     user_name: '',
     password: '',
   }
-  private readonly passwordPolicyRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{9,}$/;
+  loginApiError = '';
 
   constructor(
     public modalService: NgbModal,
@@ -35,43 +36,69 @@ export class LoginComponent {
     private readonly router:Router
   ) { }
 
-  ValidateData(action:string){
-    if(this.user_name === '' || (action=='register' && this.user_name == undefined)){this.errorValidationMessage.user_name=this.i18nService.translate('login.usernameRequired'); this.validation.user_name = false}else{this.validation.user_name =true}
-    if(this.password === '' || (action=='register' && this.password == undefined)){
-      this.errorValidationMessage.password=this.i18nService.translate('login.passwordRequired');
-      this.validation.password = false;
-    } else if (!this.passwordPolicyRegex.test(this.password)) {
-      this.errorValidationMessage.password = this.i18nService.translate('login.passwordPolicy');
-      this.validation.password = false;
-    } else {this.validation.password =true}
-
-    const response = this.validation.user_name && this.validation.password;
-    return response;
+  private normalizeLoginCredential(raw: string): string {
+    return raw.normalize('NFC').trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
   }
 
-  Login() {
-    if (this.ValidateData('register')) {
-      const userData: LoginRequest = {
-        user_name: this.user_name,
-        password: this.password
-      };
+  ValidateData(_action: string): boolean {
+    if (this.normalizeLoginCredential(this.user_name) === '') {
+      this.errorValidationMessage.user_name = this.i18nService.translate('login.usernameRequired');
+      this.validation.user_name = false;
+    } else {
+      this.validation.user_name = true;
+    }
 
-      this.authenticationService.login(userData).subscribe((result) => {
+    if (this.password === '') {
+      this.errorValidationMessage.password = this.i18nService.translate('login.passwordRequired');
+      this.validation.password = false;
+    } else {
+      this.validation.password = true;
+    }
+
+    return this.validation.user_name && this.validation.password;
+  }
+
+  Login(): void {
+    if (!this.ValidateData('login')) {
+      return;
+    }
+
+    const userData: LoginRequest = {
+      user_name: this.normalizeLoginCredential(this.user_name),
+      password: this.password
+    };
+
+    const applyApiError = (message: string): void => {
+      const errorMessage = message || this.i18nService.translate('login.invalidCredentials');
+      this.loginApiError = '';
+      if (errorMessage.includes('Wrong user')) {
+        this.validation.user_name = false;
+        this.errorValidationMessage.user_name = errorMessage;
+      } else if (errorMessage.includes('Wrong password')) {
+        this.validation.password = false;
+        this.errorValidationMessage.password = errorMessage;
+      } else {
+        this.loginApiError = errorMessage;
+      }
+    };
+
+    this.loginApiError = '';
+    this.authenticationService.login(userData).subscribe({
+      next: (result) => {
         if (result.success) {
           this.router.navigateByUrl('/home');
           return;
         }
-
-        const errorMessage = result.error ?? this.i18nService.translate('login.invalidCredentials');
-        if (errorMessage.includes('Wrong user')) {
-          this.validation.user_name = false;
-          this.errorValidationMessage.user_name = errorMessage;
-        } else {
-          this.validation.password = false;
-          this.errorValidationMessage.password = errorMessage;
-        }
-      });
-    }
+        const errorMessage =
+          typeof result.error === 'string' ? result.error : this.i18nService.translate('login.invalidCredentials');
+        applyApiError(errorMessage);
+      },
+      error: (err: HttpErrorResponse) => {
+        const body = err.error as { error?: { message?: string }; message?: string } | undefined;
+        const message = body?.error?.message ?? body?.message ?? err.message;
+        applyApiError(typeof message === 'string' ? message : '');
+      }
+    });
   }
 
   SeePassword(){

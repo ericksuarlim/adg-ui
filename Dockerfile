@@ -4,16 +4,15 @@ FROM node:18-alpine
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiamos archivos de dependencias y hacemos npm install
+# Manifests first; install deps before app source (see .dockerignore so host node_modules
+# does not overwrite node_modules from this step).
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 RUN npm install -g @angular/cli
 
-# Copiamos todo el código al contenedor
 COPY . .
 
-# Exponemos el puerto 4200 (Angular por defecto)
-EXPOSE 4200
+# Default dev port (see docker-compose ADG_UI_PORT; avoid 4200 clashes with other Angular apps)
+EXPOSE 4730
 
-# Comando para levantar servidor de desarrollo (ng serve escuchando en 0.0.0.0)
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4730"]

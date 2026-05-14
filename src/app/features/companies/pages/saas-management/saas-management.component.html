@@ -110,6 +110,7 @@
           <th>{{ 'saas.company' | t }}</th>
           <th>{{ 'saas.plan' | t }}</th>
           <th>{{ 'saas.cycle' | t }}</th>
+          <th>{{ 'saas.headLimitColumn' | t }}</th>
           <th>{{ 'saas.membership' | t }}</th>
           <th>{{ 'common.actions' | t }}</th>
         </tr>
@@ -129,6 +130,7 @@
           </td>
           <td>{{ getPlanLabel(company.plan_type) }}</td>
           <td>{{ getBillingCycleLabel(company.billing_cycle) }}</td>
+          <td>{{ getHeadLimitForCompany(company) }}</td>
           <td>{{ getMembershipStatusLabel(company.membership_status) }}</td>
           <td>
             <a class="btn btn-sm btn-outline-secondary me-1" [routerLink]="['/saas-management', company.uuid_company]">{{ 'saas.viewDetail' | t }}</a>

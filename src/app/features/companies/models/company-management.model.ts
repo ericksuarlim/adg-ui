@@ -20,11 +20,22 @@ export interface CompanyManagement {
   is_active: boolean;
 }
 
+export interface RanchSummary {
+  uuid_ranch: string;
+  uuid_company: string;
+  name: string;
+  location?: string | null;
+  area?: string | null;
+  is_active?: boolean;
+}
+
 export interface CompanyUser {
   uuid_user: string;
   id_card?: string | null;
   first_name?: string | null;
   last_name?: string | null;
+  second_last_name?: string | null;
+  phone?: string | null;
   username: string;
   email?: string | null;
   role?: UserRole;

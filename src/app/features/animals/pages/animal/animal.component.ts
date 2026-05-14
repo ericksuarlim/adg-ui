@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { SessionService } from 'src/app/core/services/session.service';
+import { hasPermission, Permission } from 'src/app/shared/constants/permissions';
 import { Animal } from '../../models/animal.model';
 import { AnimalService } from '../../services/animal.service';
 
@@ -14,7 +16,14 @@ export class AnimalComponent implements OnInit {
   page = 1;
   readonly pageSize = 10;
 
-  constructor(private readonly animalService: AnimalService) {}
+  constructor(
+    private readonly animalService: AnimalService,
+    private readonly sessionService: SessionService
+  ) {}
+
+  get canAnimalWrite(): boolean {
+    return hasPermission(this.sessionService.getRoles(), Permission.ANIMAL_WRITE);
+  }
 
   ngOnInit(): void {
     this.animalService.getAnimals().subscribe({

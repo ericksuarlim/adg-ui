@@ -1,33 +1,45 @@
-export const USER_ROLES = ['saas_owner', 'administrator', 'supervisor', 'healthcare_staff', 'user'] as const;
+export const USER_ROLES = ['saas_owner', 'administrator', 'ranch_staff'] as const;
 export type UserRole = typeof USER_ROLES[number];
 
-const LEGACY_ROLE_MAP: Record<string, UserRole> = {
-  SUPER_ADMIN: 'saas_owner',
-  ADMIN: 'administrator',
-  USER: 'user'
+const CANONICAL = USER_ROLES as readonly string[];
+
+/** Solo los tres roles canónicos (exacto o en minúsculas). */
+export const normalizeUserRole = (role: string): UserRole | null => {
+  const trimmed = typeof role === 'string' ? role.trim() : '';
+  if (!trimmed) {
+    return null;
+  }
+  if ((CANONICAL as readonly string[]).includes(trimmed)) {
+    return trimmed as UserRole;
+  }
+  const lower = trimmed.toLowerCase();
+  if ((CANONICAL as readonly string[]).includes(lower)) {
+    return lower as UserRole;
+  }
+  return null;
 };
 
-export const normalizeUserRole = (role: string): UserRole | null => {
-  if ((USER_ROLES as readonly string[]).includes(role)) {
-    return role as UserRole;
+export const normalizeUserRoles = (roles: unknown): UserRole[] => {
+  let list: string[] = [];
+  if (Array.isArray(roles)) {
+    list = roles.filter((r): r is string => typeof r === 'string' && r !== '');
+  } else if (typeof roles === 'string' && roles !== '') {
+    list = [roles];
   }
 
-  return LEGACY_ROLE_MAP[role] ?? null;
-};
-
-export const normalizeUserRoles = (roles: string[]): UserRole[] =>
-  Array.from(
+  return Array.from(
     new Set(
-      roles
+      list
         .map((role) => normalizeUserRole(role))
         .filter((role): role is UserRole => role !== null)
     )
   );
+};
 
-export const COMPANY_PLAN_TYPES = ['BASIC', 'PROFESSIONAL', 'PREMIUM'] as const;
+export const COMPANY_PLAN_TYPES = ['ESSENTIAL', 'PROFESSIONAL', 'ENTERPRISE'] as const;
 export type CompanyPlanType = typeof COMPANY_PLAN_TYPES[number];
 
-export const BILLING_CYCLES = ['MONTHLY', 'ANNUAL'] as const;
+export const BILLING_CYCLES = ['SEMESTRAL', 'ANNUAL'] as const;
 export type BillingCycle = typeof BILLING_CYCLES[number];
 
 export const MEMBERSHIP_STATUSES = ['TRIAL', 'ACTIVE', 'CANCELLED'] as const;

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -24,9 +24,12 @@ export class UserManagementService {
   constructor(private readonly http: HttpClient) {}
 
   getUsers(uuidCompany?: string): Observable<UserManagementItem[]> {
-    const query = uuidCompany ? `?uuid_company=${uuidCompany}` : '';
+    let params = new HttpParams().set('page', '1').set('size', '500');
+    if (uuidCompany?.trim()) {
+      params = params.set('uuid_company', uuidCompany);
+    }
     return this.http
-      .get<ApiListResponse<UserManagementItem>>(`${this.userUrl}${query}`)
+      .get<ApiListResponse<UserManagementItem>>(this.userUrl, { params })
       .pipe(map((response) => response.data ?? []));
   }
 
@@ -59,16 +62,31 @@ export class UserManagementService {
   }
 
   getRanches(uuidCompany?: string): Observable<RanchOption[]> {
-    const query = uuidCompany ? `?uuid_company=${uuidCompany}` : '';
+    let params = new HttpParams().set('page', '1').set('size', '500');
+    if (uuidCompany?.trim()) {
+      params = params.set('uuid_company', uuidCompany);
+    }
     return this.http
-      .get<ApiListResponse<RanchOption>>(`${this.ranchUrl}${query}`)
+      .get<ApiListResponse<RanchOption>>(this.ranchUrl, { params })
       .pipe(map((response) => response.data ?? []));
   }
 
   getMembershipsByRanch(uuidRanch: string): Observable<MembershipItem[]> {
+    const params = new HttpParams().set('page', '1').set('size', '500');
     return this.http
-      .get<ApiListResponse<MembershipItem>>(`${this.membershipUrl}/ranch/${uuidRanch}`)
+      .get<ApiListResponse<MembershipItem>>(`${this.membershipUrl}/ranch/${uuidRanch}`, { params })
       .pipe(map((response) => response.data ?? []));
+  }
+
+  getMembershipsByUser(uuidUser: string): Observable<MembershipItem[]> {
+    const params = new HttpParams().set('page', '1').set('size', '500');
+    return this.http
+      .get<ApiListResponse<MembershipItem>>(`${this.membershipUrl}/user/${uuidUser}`, { params })
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  promoteCompanyAdministrator(uuidUser: string): Observable<unknown> {
+    return this.http.post(`${this.membershipUrl}/company-administrator`, { uuid_user: uuidUser });
   }
 
   assignMembership(uuidUser: string, uuidRanch: string, role: string): Observable<unknown> {

@@ -12,10 +12,16 @@
             <ng-container *ngIf="hasAdministrationSection">
                 <li class="sidebar-header">{{ 'sidebar.administration' | t }}</li>
                 <li *ngIf="canAccessCompanies">
-                    <a routerLink="/saas-management" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-buildings me-2"></i>{{ 'sidebar.companies' | t }}</a>
+                    <a routerLink="/saas-management" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebarOnMobile()"><i class="bi bi-buildings me-2"></i>{{ 'sidebar.companies' | t }}</a>
+                </li>
+                <li *ngIf="canAccessTenantCompany && tenantCompanyRouterLink">
+                    <a [routerLink]="tenantCompanyRouterLink" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-building me-2"></i>{{ 'sidebar.company' | t }}</a>
                 </li>
                 <li *ngIf="canAccessUsers">
                     <a routerLink="/user-management" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-people me-2"></i>{{ 'sidebar.users' | t }}</a>
+                </li>
+                <li *ngIf="canAccessRanches">
+                    <a routerLink="/ranch-management" routerLinkActive="active" (click)="closeSidebarOnMobile()"><i class="bi bi-pin-map me-2"></i>{{ 'sidebar.ranches' | t }}</a>
                 </li>
             </ng-container>
             <li class="sidebar-header">Field Ops</li>

@@ -9,7 +9,8 @@ import {
   CompanyPayment,
   CompanyPaidActivationPayload,
   CompanyTrialActivationPayload,
-  CompanyUser
+  CompanyUser,
+  RanchSummary
 } from '../models/company-management.model';
 
 @Injectable({
@@ -18,6 +19,7 @@ import {
 export class SaasManagementService {
   private readonly companyUrl = `${environment.urlApi}/company`;
   private readonly userUrl = `${environment.urlApi}/user`;
+  private readonly ranchUrl = `${environment.urlApi}/ranch`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -103,5 +105,33 @@ export class SaasManagementService {
 
   voidCompanyPayment(uuidCompany: string, uuidPayment: string): Observable<unknown> {
     return this.http.delete(`${this.companyUrl}/${uuidCompany}/payments/${uuidPayment}`);
+  }
+
+  getRanchesByCompany(uuidCompany: string): Observable<RanchSummary[]> {
+    const params = new HttpParams()
+      .set('page', '1')
+      .set('size', '500')
+      .set('status', 'all')
+      .set('uuid_company', uuidCompany);
+    return this.http
+      .get<ApiListResponse<RanchSummary>>(this.ranchUrl, { params })
+      .pipe(map((response) => response.data ?? []));
+  }
+
+  createRanch(payload: { name: string; uuid_company: string; location?: string | null; area?: string | null }): Observable<RanchSummary> {
+    return this.http.post<ApiItemResponse<RanchSummary>>(this.ranchUrl, payload).pipe(map((response) => response.data));
+  }
+
+  updateRanch(
+    uuidRanch: string,
+    payload: Partial<{ name: string; location: string | null; area: string | null }>
+  ): Observable<RanchSummary> {
+    return this.http
+      .put<ApiItemResponse<RanchSummary>>(`${this.ranchUrl}/${uuidRanch}`, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  deleteRanch(uuidRanch: string): Observable<unknown> {
+    return this.http.delete(`${this.ranchUrl}/${uuidRanch}`);
   }
 }

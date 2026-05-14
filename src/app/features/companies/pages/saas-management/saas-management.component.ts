@@ -6,6 +6,11 @@ import { I18nService } from 'src/app/core/services/i18n.service';
 import { ConfirmDialogComponent } from 'src/app/shared/components/modals/confirm-dialog/confirm-dialog.component';
 import { BillingCycle, CompanyPlanType, MembershipStatus } from 'src/app/shared/constants/domain.constants';
 import {
+  normalizeBillingCycle,
+  normalizeCompanyPlanType,
+  PLAN_HEAD_LIMIT
+} from 'src/app/shared/constants/subscription.constants';
+import {
   companyCanArchive,
   companyCanEndSubscription,
   companyCanReactivate,
@@ -229,18 +234,24 @@ export class SaasManagementComponent implements OnInit {
     return this.i18nService.translate(errorKey);
   }
 
-  getPlanLabel(plan: CompanyPlanType | undefined): string {
+  getPlanLabel(plan: CompanyPlanType | string | undefined): string {
     if (!plan) {
       return '-';
     }
-    return this.i18nService.translate(`saas.planType.${plan.toLowerCase()}`);
+    const key = normalizeCompanyPlanType(String(plan)).toLowerCase();
+    return this.i18nService.translate(`saas.planType.${key}`);
   }
 
-  getBillingCycleLabel(cycle: BillingCycle | undefined): string {
+  getBillingCycleLabel(cycle: BillingCycle | string | undefined): string {
     if (!cycle) {
       return '-';
     }
-    return this.i18nService.translate(`saas.billingCycle.${cycle.toLowerCase()}`);
+    const key = normalizeBillingCycle(String(cycle)).toLowerCase();
+    return this.i18nService.translate(`saas.billingCycle.${key}`);
+  }
+
+  getHeadLimitForCompany(company: CompanyManagement): number {
+    return PLAN_HEAD_LIMIT[normalizeCompanyPlanType(company.plan_type)];
   }
 
   getMembershipStatusLabel(status: MembershipStatus | undefined): string {

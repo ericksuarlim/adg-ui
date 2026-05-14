@@ -5,27 +5,48 @@
 
   <p class="text-danger" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-  <div class="app-card p-3 mb-3" *ngIf="isSaasOwner">
+  <div class="app-card p-3 mb-3" *ngIf="isSaasOwner || ranches.length > 0">
     <div class="row g-2 align-items-end">
-      <div class="col-md-4">
+      <div class="col-md-4" *ngIf="isSaasOwner">
         <label class="form-label mb-1" for="users-company">{{ 'users.company' | t }}</label>
         <select id="users-company" class="form-select" [value]="selectedCompany" (change)="onCompanyChange($any($event.target).value)">
           <option *ngFor="let company of companies" [value]="company.uuid_company">{{ company.name }}</option>
         </select>
       </div>
+      <div class="col-md-4" *ngIf="ranches.length > 0">
+        <label class="form-label mb-1" for="users-ranch">{{ 'users.ranch' | t }}</label>
+        <select id="users-ranch" class="form-select" [value]="selectedRanch" (change)="onRanchChange($any($event.target).value)">
+          <option *ngFor="let ranch of ranches" [value]="ranch.uuid_ranch">{{ ranch.name }}</option>
+        </select>
+      </div>
     </div>
+    <p class="form-text small text-muted mb-0 mt-2" *ngIf="canManageRanchRoles">{{ 'users.membershipRulesSummary' | t }}</p>
   </div>
 
-  <div class="app-card p-3 mb-3" *ngIf="showUserForm">
-    <h5 class="mb-3">{{ editUser ? ('users.edit' | t) : ('users.create' | t) }}</h5>
+  <div class="app-card p-3 mb-3" *ngIf="editUser">
+    <h5 class="mb-3">{{ 'users.edit' | t }}</h5>
     <app-user-form
-      [mode]="editUser ? 'edit' : 'create'"
-      [showPassword]="!editUser"
+      mode="edit"
+      [showPassword]="isSaasOwner"
       [value]="formValue"
+      [companyNameHint]="selectedCompanyName"
+      [availabilityUuidCompany]="availabilityCompanyId"
+      [availabilityExcludeUserUuid]="availabilityExcludeUserId"
       [availableRoles]="assignableRoles"
-      [roleDisabled]="!isSaasOwner"
-      [submitLabelKey]="editUser ? 'users.update' : 'users.create'"
+      [roleDisabled]="!canManageRanchRoles"
+      [showTenantContext]="editUser && userFormTenantContextVisible"
+      [tenantCompanyName]="userFormTenantCompanyDisplay"
+      [tenantRanchName]="selectedRanchName"
+      [canChangeTenantCompany]="isSaasOwner"
+      [canChangeTenantRanch]="canManageRanchRoles && ranches.length > 0"
+      [tenantCompanies]="companies"
+      [tenantRanches]="ranches"
+      [selectedTenantCompanyUuid]="selectedCompany"
+      [selectedTenantRanchUuid]="selectedRanch"
+      [submitLabelKey]="'users.update'"
       [cancelLabelKey]="'common.cancel'"
+      (tenantCompanyChange)="onCompanyChange($event)"
+      (tenantRanchChange)="onRanchChange($event)"
       (submitForm)="saveUser($event)"
       (cancelForm)="cancelForm()">
     </app-user-form>
@@ -34,9 +55,9 @@
   <div class="app-card p-3 mb-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h5 class="mb-0">{{ 'users.list' | t }}</h5>
-      <button class="btn btn-primary btn-sm" (click)="toggleCreateForm()">
-        {{ showUserForm ? ('common.closeForm' | t) : ('users.create' | t) }}
-      </button>
+      <a class="btn btn-primary btn-sm" [routerLink]="['/user-management', 'create']" [queryParams]="createQueryParams">
+        {{ 'users.create' | t }}
+      </a>
     </div>
 
     <div class="table-responsive app-table">
@@ -58,7 +79,11 @@
             <td>{{ user.email }}</td>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
-            <td>{{ ('roles.' + (user.role || 'user')) | t }}</td>
+            <td>
+              <ng-container *ngIf="normalizeUserRole(user.role ?? '') as r">{{ ('roles.' + r) | t }}</ng-container>
+              <span *ngIf="user.role && !normalizeUserRole(user.role)" class="text-muted">{{ 'users.unrecognizedRole' | t }}</span>
+              <span *ngIf="!user.role" class="text-muted">—</span>
+            </td>
             <td>
               <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/user-management', user.uuid_user]">{{ 'common.detail' | t }}</a>
             </td>

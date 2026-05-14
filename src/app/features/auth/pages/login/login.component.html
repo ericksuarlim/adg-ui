@@ -27,11 +27,13 @@
                 <div *ngIf="!validation.password" class="text-danger mt-1">{{ errorValidationMessage.password }}</div>
             </div>
 
-            <button (click)="Login()" type="submit" class="login__enter-button btn btn-primary w-100 mb-3">{{ 'login.button' | t }}</button>
+            <div *ngIf="loginApiError" class="alert alert-danger py-2 small mb-2" role="alert">{{ loginApiError }}</div>
+
+            <button type="button" (click)="Login()" class="login__enter-button btn btn-primary w-100 mb-3">{{ 'login.button' | t }}</button>
 
             <div class="d-flex justify-content-between login__links">
-                <a (click)="SeePassword()" href="#!">{{ 'login.seePassword' | t }}</a>
-                <a (click)="OpenCodeSenderModal()" href="#!">{{ 'login.forgotPassword' | t }}</a>
+                <button type="button" class="btn btn-link login__link" (click)="SeePassword()">{{ 'login.seePassword' | t }}</button>
+                <button type="button" class="btn btn-link login__link" (click)="OpenCodeSenderModal()">{{ 'login.forgotPassword' | t }}</button>
             </div>
         </div>
     </div>

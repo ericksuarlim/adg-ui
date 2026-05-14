@@ -1,39 +1,95 @@
 <form class="user-form" (ngSubmit)="onSubmit()">
+  <div class="user-form-tenant-context row g-2 mb-3 pb-3 border-bottom" *ngIf="showTenantContext">
+    <div class="col-md-6">
+      <label class="form-label mb-1" for="user-form-tenant-company">{{ 'users.company' | t }}</label>
+      <select
+        *ngIf="canChangeTenantCompany && tenantCompanies.length"
+        id="user-form-tenant-company"
+        class="form-select"
+        name="tenant_company"
+        [value]="selectedTenantCompanyUuid"
+        (change)="onTenantCompanySelect($any($event.target).value)"
+      >
+        <option *ngFor="let c of tenantCompanies" [value]="c.uuid_company">{{ c.name }}</option>
+      </select>
+      <div *ngIf="!canChangeTenantCompany || !tenantCompanies.length" class="form-control bg-light">
+        {{ tenantCompanyName }}
+      </div>
+    </div>
+    <div class="col-md-6" *ngIf="value.role !== 'administrator'">
+      <label class="form-label mb-1" for="user-form-tenant-ranch">{{ 'users.ranch' | t }}</label>
+      <select
+        *ngIf="canChangeTenantRanch && tenantRanches.length"
+        id="user-form-tenant-ranch"
+        class="form-select"
+        name="tenant_ranch"
+        [value]="selectedTenantRanchUuid"
+        (change)="onTenantRanchSelect($any($event.target).value)"
+      >
+        <option *ngFor="let r of tenantRanches" [value]="r.uuid_ranch">{{ r.name }}</option>
+      </select>
+      <div *ngIf="!canChangeTenantRanch || !tenantRanches.length" class="form-control bg-light">
+        {{ tenantRanchName || '-' }}
+      </div>
+    </div>
+  </div>
+
   <div class="row g-2">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-id-card">{{ 'userForm.idCard' | t }}</label>
       <input id="user-id-card" class="form-control" [(ngModel)]="value.id_card" name="id_card"
-        (blur)="markTouched('id_card')" [class.is-invalid]="fieldInvalid('id_card')" />
+        (blur)="markTouched('id_card'); onAvailabilityBlur('id_card')" [class.is-invalid]="fieldInvalid('id_card')" />
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('id_card')">{{ fieldError('id_card') }}</div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-first-name">{{ 'userForm.firstName' | t }}</label>
       <input id="user-first-name" class="form-control" [(ngModel)]="value.first_name" name="first_name"
         (blur)="markTouched('first_name')" [class.is-invalid]="fieldInvalid('first_name')" />
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('first_name')">{{ fieldError('first_name') }}</div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-last-name">{{ 'userForm.lastName' | t }}</label>
       <input id="user-last-name" class="form-control" [(ngModel)]="value.last_name" name="last_name"
         (blur)="markTouched('last_name')" [class.is-invalid]="fieldInvalid('last_name')" />
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('last_name')">{{ fieldError('last_name') }}</div>
     </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1" for="user-second-last-name">{{ 'userForm.secondLastName' | t }}</label>
+      <input id="user-second-last-name" class="form-control" [(ngModel)]="value.second_last_name" name="second_last_name"
+        (blur)="markTouched('second_last_name')" [class.is-invalid]="fieldInvalid('second_last_name')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('second_last_name')">{{ fieldError('second_last_name') }}</div>
+    </div>
   </div>
 
   <div class="row g-2 mt-1">
-    <div class="col-md-4">
+    <div class="col-md-3">
+      <label class="form-label mb-1" for="user-phone">{{ 'userForm.phone' | t }}</label>
+      <input id="user-phone" class="form-control" [(ngModel)]="value.phone" name="phone" (blur)="markTouched('phone')"
+        [class.is-invalid]="fieldInvalid('phone')" />
+      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('phone')">{{ fieldError('phone') }}</div>
+    </div>
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-email">{{ 'common.email' | t }}</label>
-      <input id="user-email" class="form-control" [(ngModel)]="value.email" name="email" (blur)="markTouched('email')"
-        [class.is-invalid]="fieldInvalid('email')" />
+      <input id="user-email" class="form-control" [(ngModel)]="value.email" name="email"
+        (blur)="markTouched('email'); onAvailabilityBlur('email')" [class.is-invalid]="fieldInvalid('email')" />
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('email')">{{ fieldError('email') }}</div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-username">{{ 'common.username' | t }}</label>
-      <input id="user-username" class="form-control" [(ngModel)]="value.username" name="username"
-        (blur)="markTouched('username')" [class.is-invalid]="fieldInvalid('username')" />
+      <div class="input-group">
+        <input id="user-username" class="form-control" [(ngModel)]="value.username" name="username"
+          (blur)="markTouched('username'); onAvailabilityBlur('username')" [class.is-invalid]="fieldInvalid('username')" />
+        <button type="button" class="btn btn-outline-secondary" (click)="applySuggestedUsername()"
+          [disabled]="!canSuggestUsername" [title]="'userForm.suggestUsernameHint' | t">
+          {{ 'userForm.suggestUsername' | t }}
+        </button>
+      </div>
+      <div class="form-text" *ngIf="suggestedUsernamePreview && canSuggestUsername">
+        {{ 'userForm.suggestedPreview' | t }}: <code class="user-form-suggestion-preview">{{ suggestedUsernamePreview }}</code>
+      </div>
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('username')">{{ fieldError('username') }}</div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label mb-1" for="user-role">{{ 'userForm.role' | t }}</label>
       <select id="user-role" class="form-select" [(ngModel)]="value.role" name="role"
         (blur)="markTouched('role')" [disabled]="roleDisabled" [class.is-invalid]="fieldInvalid('role')">
@@ -41,16 +97,65 @@
       </select>
       <div class="invalid-feedback d-block" *ngIf="fieldInvalid('role')">{{ fieldError('role') }}</div>
     </div>
-    <div class="col-md-4" *ngIf="showPassword">
-      <label class="form-label mb-1" for="user-password">{{ 'common.password' | t }}</label>
-      <input id="user-password" class="form-control" type="password" [(ngModel)]="value.password" name="password"
-        (blur)="markTouched('password')" [class.is-invalid]="fieldInvalid('password')" />
-      <div class="invalid-feedback d-block" *ngIf="fieldInvalid('password')">{{ fieldError('password') }}</div>
+  </div>
+
+  <div class="user-form-password-block mt-1" *ngIf="showPassword">
+    <div class="mb-2" *ngIf="mode === 'edit'">
+      <p class="form-text small text-muted mb-0">{{ 'userForm.passwordLeaveBlankToKeep' | t }}</p>
+    </div>
+    <div class="row g-3 align-items-stretch">
+      <div class="col-lg-7 col-12 user-form-password-fields">
+        <div class="d-flex flex-column gap-2 h-100">
+          <div>
+            <label class="form-label mb-1" for="user-password">{{ 'common.password' | t }}</label>
+            <div class="input-group">
+              <input id="user-password" class="form-control" [type]="passwordPlainVisible ? 'text' : 'password'"
+                [(ngModel)]="value.password" name="password" (blur)="markTouched('password')"
+                [class.is-invalid]="fieldInvalid('password')" autocomplete="new-password" />
+              <button type="button" class="btn btn-outline-secondary" (click)="passwordPlainVisible = !passwordPlainVisible"
+                [attr.aria-pressed]="passwordPlainVisible" [attr.aria-label]="'userForm.togglePasswordVisibility' | t">
+                <i class="bi" [ngClass]="passwordPlainVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="fieldInvalid('password')">{{ fieldError('password') }}</div>
+          </div>
+          <div>
+            <label class="form-label mb-1" for="user-password-confirm">{{ 'userForm.confirmPassword' | t }}</label>
+            <input id="user-password-confirm" class="form-control" [type]="passwordPlainVisible ? 'text' : 'password'"
+              [(ngModel)]="passwordConfirm" name="password_confirm" (blur)="markTouched('passwordConfirm')"
+              [class.is-invalid]="fieldInvalid('passwordConfirm')" autocomplete="off" />
+            <div class="invalid-feedback d-block" *ngIf="fieldInvalid('passwordConfirm')">{{ fieldError('passwordConfirm') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 col-12 d-flex flex-column user-form-password-check-col">
+        <div class="user-form-password-checklist small w-100 flex-grow-1">
+          <div class="user-form-password-check" [class.user-form-password-check--met]="passwordHasLower">
+            <i class="bi" [ngClass]="passwordHasLower ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
+            <span>{{ 'userForm.passwordCheckLower' | t }}</span>
+          </div>
+          <div class="user-form-password-check" [class.user-form-password-check--met]="passwordHasUpper">
+            <i class="bi" [ngClass]="passwordHasUpper ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
+            <span>{{ 'userForm.passwordCheckUpper' | t }}</span>
+          </div>
+          <div class="user-form-password-check" [class.user-form-password-check--met]="passwordHasDigit">
+            <i class="bi" [ngClass]="passwordHasDigit ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
+            <span>{{ 'userForm.passwordCheckDigit' | t }}</span>
+          </div>
+          <div class="user-form-password-check" [class.user-form-password-check--met]="passwordHasMinLength">
+            <i class="bi" [ngClass]="passwordHasMinLength ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
+            <span>{{ 'userForm.passwordCheckLength' | t }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="d-flex gap-2 mt-3">
-    <button type="submit" class="btn btn-primary" [disabled]="loading">{{ submitLabelKey | t }}</button>
+    <button type="submit" class="btn btn-primary" [disabled]="submitDisabled"
+      [attr.title]="!loading && !isValid ? ('userForm.submitDisabledHint' | t) : null">
+      {{ submitLabelKey | t }}
+    </button>
     <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">{{ cancelLabelKey | t }}</button>
   </div>
 </form>

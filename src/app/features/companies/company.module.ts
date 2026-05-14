@@ -10,6 +10,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CompanyActivationComponent } from './pages/company-activation/company-activation.component';
 import { CompanyDetailComponent } from './pages/company-detail/company-detail.component';
 import { SaasManagementComponent } from './pages/saas-management/saas-management.component';
+import { CompanyRanchListComponent } from './components/company-ranch-list/company-ranch-list.component';
+import { CompanyUserListComponent } from './components/company-user-list/company-user-list.component';
+import { CompanySubscriptionListComponent } from './components/company-subscription-list/company-subscription-list.component';
 
 const routes: Routes = [
   {
@@ -35,14 +38,21 @@ const routes: Routes = [
     component: CompanyDetailComponent,
     canActivate: [AutenticacionGuard, PermissionGuard],
     data: {
-      permissions: [Permission.COMPANY_READ],
+      permissions: [Permission.COMPANY_TENANT_READ],
       breadcrumb: 'breadcrumbs.detail'
     }
   }
 ];
 
 @NgModule({
-  declarations: [SaasManagementComponent, CompanyDetailComponent, CompanyActivationComponent],
+  declarations: [
+    SaasManagementComponent,
+    CompanyDetailComponent,
+    CompanyActivationComponent,
+    CompanyRanchListComponent,
+    CompanyUserListComponent,
+    CompanySubscriptionListComponent
+  ],
   imports: [CommonModule, FormsModule, NgbModule, RouterModule.forChild(routes), SharedModule]
 })
 export class CompanyModule {}
