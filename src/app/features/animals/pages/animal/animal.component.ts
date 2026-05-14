@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SessionService } from 'src/app/core/services/session.service';
 import { hasPermission, Permission } from 'src/app/shared/constants/permissions';
-import { Animal } from '../../models/animal.model';
+import { AnimalListItem } from '../../models/animal.model';
 import { AnimalService } from '../../services/animal.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { AnimalService } from '../../services/animal.service';
   styleUrls: ['./animal.component.scss']
 })
 export class AnimalComponent implements OnInit {
-  animals: Animal[] = [];
+  animals: AnimalListItem[] = [];
   searchTerm = '';
   selectedSex = 'ALL';
   page = 1;
@@ -36,21 +36,22 @@ export class AnimalComponent implements OnInit {
     });
   }
 
-  get filteredAnimals(): Animal[] {
+  get filteredAnimals(): AnimalListItem[] {
     const normalizedSearch = this.searchTerm.trim().toLowerCase();
     return this.animals.filter((animal) => {
       const matchesSex = this.selectedSex === 'ALL' || animal.sex === this.selectedSex;
+      const reg = animal.registration_number?.toLowerCase() ?? '';
       const matchesSearch =
         normalizedSearch.length === 0 ||
-        animal.primary_tag_number?.toLowerCase().includes(normalizedSearch) ||
-        animal.secondary_tag_number?.toLowerCase().includes(normalizedSearch) ||
-        animal.color?.toLowerCase().includes(normalizedSearch) ||
-        animal.detail?.toLowerCase().includes(normalizedSearch);
+        reg.includes(normalizedSearch) ||
+        (animal.breed_code?.toLowerCase().includes(normalizedSearch) ?? false) ||
+        (animal.color?.toLowerCase().includes(normalizedSearch) ?? false) ||
+        (animal.description?.toLowerCase().includes(normalizedSearch) ?? false);
       return matchesSex && matchesSearch;
     });
   }
 
-  get paginatedAnimals(): Animal[] {
+  get paginatedAnimals(): AnimalListItem[] {
     const start = (this.page - 1) * this.pageSize;
     return this.filteredAnimals.slice(start, start + this.pageSize);
   }

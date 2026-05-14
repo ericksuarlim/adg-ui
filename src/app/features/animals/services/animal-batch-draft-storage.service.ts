@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SessionService } from 'src/app/core/services/session.service';
 import { ANIMAL_BATCH_STORAGE_PREFIX } from '../constants/animal-batch.constants';
 import {
+  ANIMAL_BATCH_DRAFT_ROW_KEYS,
   ANIMAL_BATCH_DRAFT_VERSION,
   AnimalBatchDraftRow,
   AnimalBatchDraftSnapshot
@@ -12,11 +13,7 @@ function isDraftRow(value: unknown): value is AnimalBatchDraftRow {
     return false;
   }
   const row = value as Record<string, unknown>;
-  return (
-    typeof row['ranchUuid'] === 'string' &&
-    typeof row['breedUuid'] === 'string' &&
-    typeof row['sex'] === 'string'
-  );
+  return ANIMAL_BATCH_DRAFT_ROW_KEYS.every((key) => typeof row[key as string] === 'string');
 }
 
 @Injectable({

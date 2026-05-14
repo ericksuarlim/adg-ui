@@ -8,6 +8,7 @@
   </div>
 
   <p class="text-muted small mb-2">{{ 'animal.batchRegisterSubtitle' | t }}</p>
+  <p class="text-muted small mb-1 animal-form-fields-legend">{{ 'animal.formFieldsLegend' | t }}</p>
   <p class="text-muted small mb-3 animal-batch-excel-hint">{{ 'animal.batchExcelHint' | t }}</p>
 
   <div *ngIf="feedback" class="alert" [ngClass]="feedback.type === 'success' ? 'alert-success' : 'alert-danger'" role="status">
@@ -46,6 +47,27 @@
           {{ 'animal.batchImportExcel' | t }}
         </button>
       </div>
+      <div class="col-auto border-start ps-3 ms-1 d-flex flex-wrap align-items-end gap-2">
+        <div>
+          <label class="form-label mb-0 animal-batch-label" for="batchModelRow">{{ 'animal.batchModelRowLabel' | t }}</label>
+          <input
+            id="batchModelRow"
+            class="form-control form-control-sm animal-batch-control"
+            type="number"
+            [min]="1"
+            [max]="rows.length"
+            [(ngModel)]="modelRowNumber"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </div>
+        <div class="form-check mb-1">
+          <input id="batchCopyOnlyEmpty" class="form-check-input" type="checkbox" [(ngModel)]="copyOnlyEmptyTargets" [ngModelOptions]="{ standalone: true }" />
+          <label class="form-check-label small" for="batchCopyOnlyEmpty">{{ 'animal.batchCopyOnlyEmpty' | t }}</label>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="applyModelRowToOthers()">
+          {{ 'animal.batchApplyModelRow' | t }}
+        </button>
+      </div>
       <div class="col-auto ms-auto">
         <button type="button" class="btn btn-success btn-sm" (click)="saveBatch()">
           {{ 'animal.batchSaveBatch' | t }}
@@ -61,27 +83,82 @@
           <thead class="table-light">
             <tr>
               <th scope="col" class="text-center animal-batch-col-idx">#</th>
-              <th scope="col">{{ 'animal.fieldRanchUuid' | t }}</th>
-              <th scope="col">{{ 'animal.fieldBreedUuid' | t }}</th>
-              <th scope="col">{{ 'animal.fieldSex' | t }}</th>
+              <th scope="col">{{ 'animal.fieldRegistrationNumber' | t }} <span class="animal-batch-req-star" aria-hidden="true">*</span></th>
+              <th scope="col">{{ 'animal.fieldRanch' | t }} <span class="animal-batch-req-star" aria-hidden="true">*</span></th>
+              <th scope="col">{{ 'animal.fieldBreed' | t }} <span class="animal-batch-req-star" aria-hidden="true">*</span></th>
+              <th scope="col">
+                {{ 'animal.fieldMotherRegistration' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldFatherRegistration' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldOwner' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldPaddock' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">{{ 'animal.fieldSex' | t }} <span class="animal-batch-req-star" aria-hidden="true">*</span></th>
+              <th scope="col">
+                {{ 'animal.fieldColor' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldBirthDate' | t }} <span class="animal-batch-req-star" aria-hidden="true">*</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldOriginType' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
+              <th scope="col">
+                {{ 'animal.fieldDescription' | t }} <span class="animal-batch-optional-hint">{{ 'animal.optionalParenShort' | t }}</span>
+              </th>
             </tr>
           </thead>
           <tbody formArrayName="rows">
             <tr *ngFor="let ctrl of rows.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i">
               <td class="text-center text-muted animal-batch-col-idx">{{ i + 1 }}</td>
+              <td><input class="form-control animal-batch-control" type="text" formControlName="registrationNumber" autocomplete="off" /></td>
               <td>
-                <input class="form-control animal-batch-control" type="text" formControlName="ranchUuid" autocomplete="off" />
+                <select class="form-select animal-batch-control" formControlName="ranchUuid" (change)="onRanchChange(i)">
+                  <option value="">{{ 'animal.selectRanch' | t }}</option>
+                  <option *ngFor="let r of ranchRows" [value]="r.uuid_ranch">{{ r.name }}</option>
+                </select>
               </td>
               <td>
-                <input class="form-control animal-batch-control" type="text" formControlName="breedUuid" autocomplete="off" />
+                <select class="form-select animal-batch-control" formControlName="breedCode">
+                  <option *ngFor="let c of breedCodes" [value]="c">{{ breedLabel(c) }}</option>
+                </select>
+              </td>
+              <td><input class="form-control animal-batch-control" type="text" formControlName="motherRegistrationNumber" autocomplete="off" /></td>
+              <td><input class="form-control animal-batch-control" type="text" formControlName="fatherRegistrationNumber" autocomplete="off" /></td>
+              <td>
+                <select class="form-select animal-batch-control" formControlName="currentOwnerUuid">
+                  <option value="">{{ 'animal.optionNone' | t }}</option>
+                  <option *ngFor="let o of ownerRows" [value]="o.owner_uuid">{{ o.full_name }}</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-select animal-batch-control" formControlName="currentPaddockUuid">
+                  <option value="">{{ ctrl.get('ranchUuid')?.value ? ('animal.optionNone' | t) : ('animal.selectRanchFirst' | t) }}</option>
+                  <option *ngFor="let p of paddockOptionsForRow(i)" [value]="p.paddock_uuid">{{ p.name }}</option>
+                </select>
               </td>
               <td>
                 <select class="form-select animal-batch-control" formControlName="sex">
-                  <option value=""></option>
                   <option value="MALE">{{ 'animal.sexMaleApi' | t }}</option>
                   <option value="FEMALE">{{ 'animal.sexFemaleApi' | t }}</option>
                 </select>
               </td>
+              <td><input class="form-control animal-batch-control" type="text" formControlName="color" autocomplete="off" /></td>
+              <td><input class="form-control animal-batch-control" type="date" formControlName="birthDate" autocomplete="off" /></td>
+              <td>
+                <select class="form-select animal-batch-control" formControlName="originType">
+                  <option value="UNKNOWN">{{ 'animal.originUnknown' | t }}</option>
+                  <option value="BIRTH">{{ 'animal.originBirth' | t }}</option>
+                  <option value="PURCHASE">{{ 'animal.originPurchase' | t }}</option>
+                  <option value="TRANSFER">{{ 'animal.originTransfer' | t }}</option>
+                </select>
+              </td>
+              <td><input class="form-control animal-batch-control" type="text" formControlName="description" autocomplete="off" /></td>
             </tr>
           </tbody>
         </table>

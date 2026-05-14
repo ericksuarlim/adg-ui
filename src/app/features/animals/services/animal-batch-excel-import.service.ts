@@ -7,6 +7,23 @@ function normalizeHeaderKey(key: string): string {
   return key.toLowerCase().trim().replace(/\s+/g, '_');
 }
 
+function normalizedCells(record: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(record)) {
+    out[normalizeHeaderKey(k)] = String(v ?? '').trim();
+  }
+  return out;
+}
+
+function pickFromKeys(cells: Record<string, string>, keys: string[]): string {
+  for (const key of keys) {
+    if (cells[key]) {
+      return cells[key];
+    }
+  }
+  return '';
+}
+
 function normalizeSexCell(raw: string): AnimalBatchDraftRow['sex'] {
   const u = raw.trim().toUpperCase();
   if (u === 'MALE' || u === 'M' || u === 'MACHO' || u === '1') {
@@ -18,60 +35,62 @@ function normalizeSexCell(raw: string): AnimalBatchDraftRow['sex'] {
   return '';
 }
 
-function normalizedCells(record: Record<string, unknown>): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(record)) {
-    out[normalizeHeaderKey(k)] = String(v ?? '').trim();
+function normalizeOriginCell(raw: string): AnimalBatchDraftRow['originType'] {
+  const u = raw.trim().toUpperCase();
+  if (u === 'BIRTH' || u === 'NACIMIENTO' || u === 'N') {
+    return 'BIRTH';
   }
-  return out;
+  if (u === 'PURCHASE' || u === 'COMPRA' || u === 'P') {
+    return 'PURCHASE';
+  }
+  if (u === 'TRANSFER' || u === 'TRANSFERENCIA' || u === 'T') {
+    return 'TRANSFER';
+  }
+  if (u === 'UNKNOWN' || u === 'DESCONOCIDO' || u === 'U') {
+    return 'UNKNOWN';
+  }
+  return '';
 }
 
 function pickRanchUuid(cells: Record<string, string>): string {
-  const direct = ['ranch_uuid', 'ranchuuid', 'uuid_ranch', 'uuid_rancho', 'ranch', 'rancho'];
-  for (const key of direct) {
-    if (cells[key]) {
-      return cells[key];
-    }
-  }
-  for (const [key, value] of Object.entries(cells)) {
-    if (!value) {
-      continue;
-    }
-    if (key.includes('ranch') && key.includes('uuid')) {
-      return value;
-    }
-  }
-  return '';
+  return pickFromKeys(cells, ['ranch_uuid', 'ranchuuid', 'uuid_ranch', 'uuid_rancho', 'ranch', 'rancho']);
 }
 
-function pickBreedUuid(cells: Record<string, string>): string {
-  const direct = ['breed_uuid', 'breeduuid', 'uuid_breed', 'uuid_raza', 'breed', 'raza'];
-  for (const key of direct) {
-    if (cells[key]) {
-      return cells[key];
-    }
-  }
-  for (const [key, value] of Object.entries(cells)) {
-    if (!value) {
-      continue;
-    }
-    if (key.includes('breed') && key.includes('uuid')) {
-      return value;
-    }
-  }
-  return '';
+function pickBreedCode(cells: Record<string, string>): string {
+  return pickFromKeys(cells, ['breed_code', 'breedcode', 'breed', 'raza', 'breed_uuid', 'breeduuid', 'uuid_breed']);
 }
 
 function pickSexRaw(cells: Record<string, string>): string {
-  return cells['sex'] || cells['sexo'] || cells['gender'] || '';
+  return pickFromKeys(cells, ['sex', 'sexo', 'gender']);
 }
 
 function mapObjectRow(record: Record<string, unknown>): AnimalBatchDraftRow {
   const cells = normalizedCells(record);
+  const base = emptyBatchDraftRow();
   return {
+    ...base,
+    registrationNumber: pickFromKeys(cells, ['registration_number', 'registro', 'numero_registro', 'id_registro']),
     ranchUuid: pickRanchUuid(cells),
-    breedUuid: pickBreedUuid(cells),
-    sex: normalizeSexCell(pickSexRaw(cells))
+    breedCode: pickBreedCode(cells),
+    motherRegistrationNumber: pickFromKeys(cells, [
+      'mother_registration_number',
+      'mother_reg',
+      'madre_registro',
+      'registro_madre'
+    ]),
+    fatherRegistrationNumber: pickFromKeys(cells, [
+      'father_registration_number',
+      'father_reg',
+      'padre_registro',
+      'registro_padre'
+    ]),
+    currentOwnerUuid: pickFromKeys(cells, ['current_owner_uuid', 'owner_uuid', 'uuid_propietario']),
+    currentPaddockUuid: pickFromKeys(cells, ['current_paddock_uuid', 'paddock_uuid', 'uuid_potrero', 'uuid_piquete']),
+    sex: normalizeSexCell(pickSexRaw(cells)),
+    color: pickFromKeys(cells, ['color']),
+    birthDate: pickFromKeys(cells, ['birth_date', 'birthdate', 'fecha_nacimiento', 'nacimiento']),
+    originType: normalizeOriginCell(pickFromKeys(cells, ['origin_type', 'origen', 'tipo_origen'])),
+    description: pickFromKeys(cells, ['description', 'descripcion', 'detalle', 'notas'])
   };
 }
 
@@ -92,10 +111,10 @@ function parseFromGridRows(worksheet: XLSX.WorkSheet): AnimalBatchDraftRow[] {
     if (!Array.isArray(row)) {
       continue;
     }
-    const ranch = String(row[0] ?? '').trim();
-    const breed = String(row[1] ?? '').trim();
-    const sex = normalizeSexCell(String(row[2] ?? ''));
-    const draft: AnimalBatchDraftRow = { ranchUuid: ranch, breedUuid: breed, sex };
+    const draft = emptyBatchDraftRow();
+    draft.ranchUuid = String(row[0] ?? '').trim();
+    draft.breedCode = String(row[1] ?? '').trim();
+    draft.sex = normalizeSexCell(String(row[2] ?? ''));
     if (batchDraftRowHasData(draft)) {
       out.push(draft);
     }

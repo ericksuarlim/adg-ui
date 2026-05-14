@@ -1,9 +1,23 @@
-import { AnimalBatchDraftRow } from '../models/animal-batch-draft.model';
+import { ANIMAL_BATCH_DRAFT_ROW_KEYS, AnimalBatchDraftRow } from '../models/animal-batch-draft.model';
 
 export function batchDraftRowHasData(row: AnimalBatchDraftRow): boolean {
-  return [row.ranchUuid, row.breedUuid, row.sex].some((v) => String(v ?? '').trim().length > 0);
+  const s = (v: string | undefined) => String(v ?? '').trim();
+  return ANIMAL_BATCH_DRAFT_ROW_KEYS.some((key) => s(row[key]));
 }
 
 export function emptyBatchDraftRow(): AnimalBatchDraftRow {
-  return { ranchUuid: '', breedUuid: '', sex: '' };
+  return {
+    registrationNumber: '',
+    ranchUuid: '',
+    breedCode: '',
+    motherRegistrationNumber: '',
+    fatherRegistrationNumber: '',
+    currentOwnerUuid: '',
+    currentPaddockUuid: '',
+    sex: '',
+    color: '',
+    birthDate: '',
+    originType: '',
+    description: ''
+  };
 }

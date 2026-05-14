@@ -1,7 +1,26 @@
 .animal-individual-card {
-  max-width: 28rem;
+  max-width: 52rem;
 }
 
 .animal-individual .form-label {
   font-size: 0.8rem;
+}
+
+.animal-individual .form-select.form-select-sm {
+  max-width: 100%;
+  padding-right: 2.25rem;
+  background-position: right 0.5rem center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.animal-form-fields-legend {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.animal-optional-mark {
+  font-size: 0.85em;
+  white-space: nowrap;
 }
